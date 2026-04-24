@@ -1,5 +1,5 @@
-import { getProfile, runChecks } from "@ai-ping/core";
-import type { RunChecksOptions, WireCheckReport } from "@ai-ping/core";
+import { getProfile, runChecks } from "@starroy/ai-ping-core";
+import type { RunChecksOptions, WireCheckReport } from "@starroy/ai-ping-core";
 import { resolveApiKey } from "../env";
 import { CliUsageError, getExitCodeFromReport } from "../exit-code";
 import { parseListOption } from "../parse-list";

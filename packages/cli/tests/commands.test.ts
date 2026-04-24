@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ProtocolProfile, RunChecksOptions } from "@ai-ping/core";
+import type { ProtocolProfile, RunChecksOptions } from "@starroy/ai-ping-core";
 import { runCheckCommand } from "../src/commands/check";
 import { runChecksCommand } from "../src/commands/checks";
 import { runProfilesCommand } from "../src/commands/profiles";
@@ -13,7 +13,7 @@ const coreMocks = vi.hoisted(() => ({
   runChecks: vi.fn(),
 }));
 
-vi.mock("@ai-ping/core", () => coreMocks);
+vi.mock("@starroy/ai-ping-core", () => coreMocks);
 
 describe("runCheckCommand", () => {
   beforeEach(() => {

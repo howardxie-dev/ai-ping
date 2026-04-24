@@ -1,4 +1,4 @@
-# ai-ping
+# @starroy/ai-ping
 
 Command-line interface for AI Ping protocol checks.
 

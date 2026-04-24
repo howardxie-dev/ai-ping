@@ -1,5 +1,5 @@
-import { getProfile, listChecks } from "@ai-ping/core";
-import type { ProtocolProfile, WireCheck } from "@ai-ping/core";
+import { getProfile, listChecks } from "@starroy/ai-ping-core";
+import type { ProtocolProfile, WireCheck } from "@starroy/ai-ping-core";
 import { CliUsageError } from "../exit-code";
 
 export interface ChecksCommandOptions {

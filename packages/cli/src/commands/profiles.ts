@@ -1,5 +1,5 @@
-import { listProfiles } from "@ai-ping/core";
-import type { ProtocolProfile } from "@ai-ping/core";
+import { listProfiles } from "@starroy/ai-ping-core";
+import type { ProtocolProfile } from "@starroy/ai-ping-core";
 
 export interface ProfilesCommandDeps {
   listProfiles: () => ProtocolProfile[];

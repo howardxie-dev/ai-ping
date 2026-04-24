@@ -1,9 +1,9 @@
-# @ai-ping/core
+# @starroy/ai-ping-core
 
 Reusable protocol checks for AI and LLM API endpoints.
 
 ```ts
-import { runChecks } from "@ai-ping/core";
+import { runChecks } from "@starroy/ai-ping-core";
 
 const report = await runChecks({
   profile: "openai",

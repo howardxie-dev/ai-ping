@@ -31,7 +31,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Added `@ai-ping/core`.
+- Added `@starroy/ai-ping-core`.
 - Added OpenAI-compatible profile.
 - Added basic, streaming, and error format checks.
 - Added structured report and summary output.

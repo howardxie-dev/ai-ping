@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { AiPingConfigError } from "@ai-ping/core";
+import { AiPingConfigError } from "@starroy/ai-ping-core";
 import { CliUsageError, EXIT_RUNTIME_ERROR } from "./exit-code";
 import { main } from "./main";
 

@@ -1,4 +1,4 @@
-import type { WireCheckReport } from "@ai-ping/core";
+import type { WireCheckReport } from "@starroy/ai-ping-core";
 
 export const EXIT_OK = 0;
 export const EXIT_CHECK_FAILED = 1;

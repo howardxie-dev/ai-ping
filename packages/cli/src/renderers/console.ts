@@ -1,5 +1,5 @@
 import pc from "picocolors";
-import type { CheckResult, WireCheckReport } from "@ai-ping/core";
+import type { CheckResult, WireCheckReport } from "@starroy/ai-ping-core";
 
 export interface RenderConsoleOptions {
   verbose?: boolean;

@@ -1,7 +1,7 @@
 # AI Ping
 
 [![CI](https://github.com/howardxie-dev/ai-ping/actions/workflows/ci.yml/badge.svg)](https://github.com/howardxie-dev/ai-ping/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/ai-ping.svg)](https://www.npmjs.com/package/ai-ping)
+[![npm version](https://img.shields.io/npm/v/@starroy/ai-ping.svg)](https://www.npmjs.com/package/@starroy/ai-ping)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 Quick protocol checks for AI and LLM API endpoints.
@@ -21,8 +21,8 @@ endpoint exposes protocol behavior that common clients can consume.
 
 AI Ping currently includes:
 
-- `@ai-ping/core`, the reusable protocol checking core
-- `ai-ping`, the CLI package that provides the `aiping` command
+- `@starroy/ai-ping-core`, the reusable protocol checking core
+- `@starroy/ai-ping`, the CLI package that provides the `aiping` command
 - OpenAI-compatible profile
 - Basic non-streaming chat completion check
 - Streaming chat completion check
@@ -33,7 +33,7 @@ AI Ping currently includes:
 ## Core Usage
 
 ```ts
-import { runChecks } from "@ai-ping/core";
+import { runChecks } from "@starroy/ai-ping-core";
 
 const report = await runChecks({
   profile: "openai",
@@ -65,7 +65,7 @@ guidelines.
 Install globally after publication:
 
 ```bash
-npm install -g ai-ping
+npm install -g @starroy/ai-ping
 ```
 
 Local development:
@@ -73,7 +73,7 @@ Local development:
 ```bash
 pnpm install
 pnpm build
-pnpm --filter ai-ping cli --help
+pnpm --filter @starroy/ai-ping cli --help
 ```
 
 Run protocol checks:
@@ -142,7 +142,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm install -g ai-ping
+      - run: npm install -g @starroy/ai-ping
       - run: |
           aiping check \
             --profile openai \

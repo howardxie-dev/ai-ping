@@ -15,20 +15,20 @@
 
 ## Package Verification
 
-- [ ] `ai-ping` package includes `dist`, `README.md`, `package.json`, `LICENSE`
-- [ ] `@ai-ping/core` package includes `dist`, `README.md`, `package.json`, `LICENSE`
+- [ ] `@starroy/ai-ping` package includes `dist`, `README.md`, `package.json`, `LICENSE`
+- [ ] `@starroy/ai-ping-core` package includes `dist`, `README.md`, `package.json`, `LICENSE`
 - [ ] Packages do not include `src`, `tests`, `node_modules`, or design docs
 
 ## Publish
 
-- [ ] Publish `@ai-ping/core`
-- [ ] Publish `ai-ping`
+- [ ] Publish `@starroy/ai-ping-core`
+- [ ] Publish `@starroy/ai-ping`
 - [ ] Create git tag
 - [ ] Create GitHub release
 
 ## Post-release
 
-- [ ] Install `ai-ping` globally from npm
+- [ ] Install `@starroy/ai-ping` globally from npm
 - [ ] Run `aiping --help`
 - [ ] Run `aiping profiles`
 - [ ] Run `aiping checks --profile openai`

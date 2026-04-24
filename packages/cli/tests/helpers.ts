@@ -3,7 +3,7 @@ import type {
   ProtocolProfile,
   WireCheck,
   WireCheckReport,
-} from "@ai-ping/core";
+} from "@starroy/ai-ping-core";
 
 export function makeResult(
   overrides: Partial<CheckResult> = {},
