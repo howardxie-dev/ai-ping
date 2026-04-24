@@ -146,7 +146,6 @@ function collectMissingRecommendedFields(models: unknown[]): string[] {
       continue;
     }
 
-    if (typeof model.baseModelId !== "string") missing.add("baseModelId");
     if (typeof model.version !== "string") missing.add("version");
     if (typeof model.displayName !== "string") missing.add("displayName");
     if (!Array.isArray(model.supportedGenerationMethods)) {

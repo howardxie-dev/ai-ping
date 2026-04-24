@@ -40,9 +40,6 @@ export const geminiGenerateStreamCheck: WireCheck = {
       if (!contentType.toLowerCase().includes("text/event-stream")) {
         missingRecommendedFields.push("content-type");
       }
-      if (!parsed.hasDoneMarker) {
-        missingRecommendedFields.push("done_marker");
-      }
       const details = {
         status: response.status,
         dataLineCount: parsed.dataLines.length,
@@ -51,7 +48,6 @@ export const geminiGenerateStreamCheck: WireCheck = {
         chunksWithCandidates,
         textPartCount: textParts.length,
         hasNonEmptyText: textParts.some((text) => text.length > 0),
-        hasDoneMarker: parsed.hasDoneMarker,
         missingRecommendedFields,
       };
 

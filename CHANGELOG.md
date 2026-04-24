@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.6.1
+
+### Changed
+
+- Tuned Gemini warning rules based on real Gemini Developer API smoke results.
+- Stopped treating a missing OpenAI-style `[DONE]` marker as a Gemini streaming
+  warning.
+- Reduced recommended-field noise for Gemini models list and error responses.
+
 ## 0.6.0
 
 ### Added

@@ -83,7 +83,7 @@ export const geminiErrorFormatCheck: WireCheck = {
         });
       }
 
-      const missingRecommendedFields = ["code", "status", "details"].filter(
+      const missingRecommendedFields = ["code", "status"].filter(
         (field) => !(field in errorBody),
       );
       const shouldWarn =

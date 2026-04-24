@@ -10,7 +10,7 @@ import type {
 import { AiPingConfigError } from "./types";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
-const VERSION = "0.6.0";
+const VERSION = "0.6.1";
 
 export async function runChecks(
   options: RunChecksOptions,

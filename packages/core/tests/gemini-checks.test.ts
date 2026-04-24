@@ -105,7 +105,6 @@ describe("geminiModelsListCheck", () => {
 
     expect(result.status).toBe("warn");
     expect(result.details?.missingRecommendedFields).toEqual([
-      "baseModelId",
       "version",
       "displayName",
       "supportedGenerationMethods",
@@ -319,7 +318,7 @@ describe("geminiGenerateStreamCheck", () => {
     );
   });
 
-  it("warns when content-type, done marker, and recommended fields are missing", async () => {
+  it("warns when content-type and recommended fields are missing", async () => {
     const request = {
       json: vi.fn(),
       stream: vi.fn().mockResolvedValue(
@@ -338,8 +337,24 @@ describe("geminiGenerateStreamCheck", () => {
       "modelVersion",
       "usageMetadata",
       "content-type",
-      "done_marker",
     ]);
+  });
+
+  it("passes without an OpenAI-style done marker", async () => {
+    const request = {
+      json: vi.fn(),
+      stream: vi.fn().mockResolvedValue(
+        streamResponse(
+          200,
+          'data: {"candidates":[{"content":{"parts":[{"text":"pong"}]},"finishReason":"STOP"}],"usageMetadata":{},"modelVersion":"gemini-2.5-flash"}',
+        ),
+      ),
+    };
+
+    const result = await geminiGenerateStreamCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("pass");
+    expect(result.details?.missingRecommendedFields).toEqual([]);
   });
 
   it("warns when part of the stream is invalid JSON", async () => {
@@ -450,10 +465,27 @@ describe("geminiErrorFormatCheck", () => {
     const result = await geminiErrorFormatCheck.run(mockContext({ request }));
 
     expect(result.status).toBe("warn");
-    expect(result.details?.missingRecommendedFields).toEqual([
-      "code",
-      "details",
-    ]);
+    expect(result.details?.missingRecommendedFields).toEqual(["code"]);
+  });
+
+  it("passes when details is missing but code and status are present", async () => {
+    const request = {
+      json: vi.fn().mockResolvedValue(
+        jsonResponse(400, {
+          error: {
+            code: 400,
+            message: "contents is required",
+            status: "INVALID_ARGUMENT",
+          },
+        }),
+      ),
+      stream: vi.fn(),
+    };
+
+    const result = await geminiErrorFormatCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("pass");
+    expect(result.details?.missingRecommendedFields).toEqual([]);
   });
 
   it("fails when an invalid request returns 2xx", async () => {

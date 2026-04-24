@@ -1,6 +1,6 @@
 {
   "name": "@starroy/ai-ping",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Quick protocol checks for AI and LLM API endpoints.",
   "license": "MIT",
   "type": "module",
@@ -45,7 +45,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@starroy/ai-ping-core": "0.6.0",
+    "@starroy/ai-ping-core": "0.6.1",
     "cac": "^6.7.14",
     "picocolors": "^1.1.1"
   },
