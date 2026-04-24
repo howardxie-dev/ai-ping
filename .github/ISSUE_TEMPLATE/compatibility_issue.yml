@@ -1,0 +1,73 @@
+name: Compatibility issue
+description: Report an AI API compatibility issue
+title: "compat: "
+labels: ["compatibility"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please remove secrets before posting any command, logs, or JSON report.
+
+  - type: input
+    id: profile
+    attributes:
+      label: Profile
+      placeholder: "openai"
+    validations:
+      required: true
+
+  - type: input
+    id: endpoint_type
+    attributes:
+      label: Endpoint type
+      placeholder: "local proxy / gateway / provider / self-hosted"
+    validations:
+      required: true
+
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      placeholder: "gpt-4o-mini"
+    validations:
+      required: true
+
+  - type: input
+    id: client_sdk
+    attributes:
+      label: Client or SDK
+      placeholder: "openai-node / LiteLLM / custom client"
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      render: bash
+      description: Paste the command you ran. Remove API keys before posting.
+    validations:
+      required: true
+
+  - type: textarea
+    id: report
+    attributes:
+      label: Sanitized JSON report
+      description: Run `aiping check --profile openai --base-url <your-endpoint> --model <your-model> --json` and paste the sanitized output. Please remove secrets before posting the report.
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected compatibility behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true

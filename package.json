@@ -1,0 +1,30 @@
+{
+  "name": "ai-ping-workspace",
+  "version": "0.2.5",
+  "private": true,
+  "description": "Quick protocol checks for AI and LLM API endpoints.",
+  "license": "MIT",
+  "type": "module",
+  "author": "Howard Xie",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/howardxie-dev/ai-ping.git"
+  },
+  "bugs": {
+    "url": "https://github.com/howardxie-dev/ai-ping/issues"
+  },
+  "homepage": "https://github.com/howardxie-dev/ai-ping#readme",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "pack:check": "pnpm -r --if-present pack:check"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.8.1"
+}

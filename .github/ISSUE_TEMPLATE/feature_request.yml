@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest a new feature or check
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use case
+      description: What problem are you trying to solve?
+    validations:
+      required: true
+
+  - type: input
+    id: profile
+    attributes:
+      label: Target profile
+      placeholder: "openai / anthropic / gemini / ollama"
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed check
+      description: Describe the check or behavior you want.
+    validations:
+      required: true
+
+  - type: textarea
+    id: insufficiency
+    attributes:
+      label: Why existing checks are insufficient
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered

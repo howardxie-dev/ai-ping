@@ -1,0 +1,49 @@
+import { describe, expect, it } from "vitest";
+import { resolveApiKey } from "../src/env";
+
+describe("resolveApiKey", () => {
+  it("prefers an explicit API key", () => {
+    expect(
+      resolveApiKey({
+        explicitApiKey: "explicit-key",
+        profile: "openai",
+        env: {
+          AI_PING_API_KEY: "ai-ping-key",
+          OPENAI_API_KEY: "openai-key",
+        },
+      }),
+    ).toBe("explicit-key");
+  });
+
+  it("falls back to AI_PING_API_KEY", () => {
+    expect(
+      resolveApiKey({
+        profile: "openai",
+        env: {
+          AI_PING_API_KEY: "ai-ping-key",
+          OPENAI_API_KEY: "openai-key",
+        },
+      }),
+    ).toBe("ai-ping-key");
+  });
+
+  it("uses OPENAI_API_KEY only for the openai profile", () => {
+    expect(
+      resolveApiKey({
+        profile: "openai",
+        env: { OPENAI_API_KEY: "openai-key" },
+      }),
+    ).toBe("openai-key");
+
+    expect(
+      resolveApiKey({
+        profile: "anthropic",
+        env: { OPENAI_API_KEY: "openai-key" },
+      }),
+    ).toBeUndefined();
+  });
+
+  it("returns undefined when no matching key is available", () => {
+    expect(resolveApiKey({ profile: "openai", env: {} })).toBeUndefined();
+  });
+});

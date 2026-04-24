@@ -1,0 +1,57 @@
+{
+  "name": "@ai-ping/core",
+  "version": "0.2.5",
+  "description": "Core protocol checks for AI and LLM API endpoints.",
+  "license": "MIT",
+  "type": "module",
+  "author": "Howard Xie",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ai",
+    "llm",
+    "api",
+    "protocol",
+    "openai",
+    "smoke-test"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/howardxie-dev/ai-ping.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/howardxie-dev/ai-ping/issues"
+  },
+  "homepage": "https://github.com/howardxie-dev/ai-ping#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "pack:check": "pnpm build && npm pack --dry-run",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "vitest": "^4.0.15"
+  }
+}
