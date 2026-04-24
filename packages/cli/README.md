@@ -10,6 +10,7 @@ The npm package is `@starroy/ai-ping` and the installed command is `aiping`.
 | --- | --- | --- | --- |
 | `openai` | OpenAI-compatible APIs | Usually requires an API key | SSE |
 | `ollama` | Ollama local APIs | No API key by default | JSON lines |
+| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE |
 
 ## Usage
 
@@ -51,6 +52,20 @@ is the messages-style native API. For Ollama's OpenAI-compatible
 
 Ollama checks currently include `ollama.tags`, `ollama.generate.basic`,
 `ollama.generate.stream`, `ollama.chat.basic`, and `ollama.chat.stream`.
+
+Check Gemini Developer API:
+
+```bash
+GEMINI_API_KEY=your-key aiping check \
+  --profile gemini \
+  --base-url https://generativelanguage.googleapis.com/v1beta \
+  --model gemini-2.5-flash
+```
+
+The `gemini` profile uses `x-goog-api-key` and covers Gemini Developer API REST,
+not Vertex AI Gemini API or Gemini OpenAI compatibility. Gemini streaming uses
+SSE, but the response chunks are Gemini `GenerateContentResponse` objects rather
+than OpenAI delta chunks.
 
 Use JSON output for issue reports or CI artifacts:
 

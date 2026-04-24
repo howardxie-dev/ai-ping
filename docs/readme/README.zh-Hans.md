@@ -29,11 +29,18 @@ AI Ping 目前包含两个核心部分：
 | --- | --- | --- | --- |
 | `openai` | OpenAI-compatible API | 通常需要 API key | SSE |
 | `ollama` | Ollama 本地 API | 默认不需要 API key | JSON lines |
+| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE |
 
 `ollama` profile 覆盖 Ollama native `/api/tags`、`/api/generate` 和
 `/api/chat`。`/api/generate` 是 prompt-style native API，`/api/chat` 是
 messages-style native API。Ollama OpenAI-compatible `/v1/chat/completions`
 应使用 `openai` profile 检查。
+
+`gemini` profile 覆盖 Gemini Developer API REST，base URL 示例为
+`https://generativelanguage.googleapis.com/v1beta`。它通过 `--api-key`、
+`AI_PING_API_KEY` 或 `GEMINI_API_KEY` 使用 `x-goog-api-key` 认证。Vertex
+AI Gemini API 与 Gemini OpenAI compatibility 不属于此 profile。Gemini
+streaming 使用 SSE，但响应 chunk 不是 OpenAI delta 格式。
 
 当前支持的检查项：
 
@@ -42,6 +49,7 @@ messages-style native API。Ollama OpenAI-compatible `/v1/chat/completions`
 - 流式 chat completion 检查
 - 错误响应格式检查
 - Ollama checks：`ollama.tags`、`ollama.generate.basic`、`ollama.generate.stream`、`ollama.chat.basic`、`ollama.chat.stream`
+- Gemini checks：`gemini.models.list`、`gemini.generate.basic`、`gemini.generate.stream`、`gemini.error.format`
 - 结构化报告，支持 `pass`、`warn`、`fail`、`skip`
 
 npm 包名是 `@starroy/ai-ping`，实际命令名是 `aiping`。
@@ -107,6 +115,15 @@ Ollama 不需要 API key。它的 streaming 响应使用 JSON lines，不是 SSE
 Ollama OpenAI-compatible `/v1/chat/completions` 不属于 `ollama` native
 profile 覆盖范围，请使用 `openai` profile 检查。
 
+检查 Gemini Developer API：
+
+```bash
+GEMINI_API_KEY=your-key aiping check \
+  --profile gemini \
+  --base-url https://generativelanguage.googleapis.com/v1beta \
+  --model gemini-2.5-flash
+```
+
 通过参数或环境变量传入 API key：
 
 ```bash
@@ -116,11 +133,12 @@ AI_PING_API_KEY=sk-test aiping check \
   --model gpt-4o-mini
 ```
 
-对于 `openai` profile，也支持 `OPENAI_API_KEY`。优先级为：
+对于 `openai` profile，也支持 `OPENAI_API_KEY`。对于 `gemini` profile，
+也支持 `GEMINI_API_KEY`。优先级为：
 
 1. `--api-key`
 2. `AI_PING_API_KEY`
-3. `OPENAI_API_KEY`
+3. profile 专用环境变量，例如 `OPENAI_API_KEY` 或 `GEMINI_API_KEY`
 
 输出 JSON 报告，便于附到 issue 或 CI artifact：
 

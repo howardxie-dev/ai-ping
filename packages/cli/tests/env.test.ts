@@ -43,6 +43,22 @@ describe("resolveApiKey", () => {
     ).toBeUndefined();
   });
 
+  it("uses GEMINI_API_KEY only for the gemini profile", () => {
+    expect(
+      resolveApiKey({
+        profile: "gemini",
+        env: { GEMINI_API_KEY: "gemini-key" },
+      }),
+    ).toBe("gemini-key");
+
+    expect(
+      resolveApiKey({
+        profile: "openai",
+        env: { GEMINI_API_KEY: "gemini-key" },
+      }),
+    ).toBeUndefined();
+  });
+
   it("returns undefined when no matching key is available", () => {
     expect(resolveApiKey({ profile: "openai", env: {} })).toBeUndefined();
   });

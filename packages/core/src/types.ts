@@ -91,6 +91,7 @@ export interface HttpRequestInput {
   headers?: Record<string, string>;
   body?: unknown;
   timeoutMs?: number;
+  skipDefaultAuth?: boolean;
 }
 
 export interface HttpJsonResponse<T = unknown> {

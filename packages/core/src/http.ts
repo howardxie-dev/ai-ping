@@ -71,7 +71,11 @@ function send(
     ...input.headers,
   };
 
-  if (options.apiKey && !hasHeader(headers, "authorization")) {
+  if (
+    options.apiKey &&
+    !input.skipDefaultAuth &&
+    !hasHeader(headers, "authorization")
+  ) {
     headers.authorization = `Bearer ${options.apiKey}`;
   }
 

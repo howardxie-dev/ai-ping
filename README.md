@@ -25,6 +25,7 @@ AI Ping currently includes:
 - `@starroy/ai-ping`, the CLI package that provides the `aiping` command
 - OpenAI-compatible profile
 - Ollama profile
+- Gemini Developer API profile
 - Models list compatibility check
 - Basic non-streaming chat completion check
 - Streaming chat completion check
@@ -41,11 +42,20 @@ The npm package is published as `@starroy/ai-ping`, while the CLI command is
 | --- | --- | --- | --- |
 | `openai` | OpenAI-compatible APIs | Usually requires an API key | SSE |
 | `ollama` | Ollama local APIs | No API key by default | JSON lines |
+| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE |
 
 The `ollama` profile covers Ollama native `/api/tags`, `/api/generate`, and
 `/api/chat`. `/api/generate` is the prompt-style native API, while `/api/chat`
 is the messages-style native API. For Ollama's OpenAI-compatible
 `/v1/chat/completions`, use the `openai` profile instead.
+
+The `gemini` profile covers Gemini Developer API REST endpoints under a base URL
+such as `https://generativelanguage.googleapis.com/v1beta`. It uses
+`x-goog-api-key` authentication via `--api-key`, `AI_PING_API_KEY`, or
+`GEMINI_API_KEY`. Vertex AI Gemini API and Gemini OpenAI compatibility are
+separate APIs and are not covered by this profile. Gemini streaming uses SSE,
+but its chunks are Gemini `GenerateContentResponse` objects rather than OpenAI
+delta chunks.
 
 ## Core Usage
 
@@ -139,6 +149,15 @@ SSE.
 Ollama checks currently include `ollama.tags`, `ollama.generate.basic`,
 `ollama.generate.stream`, `ollama.chat.basic`, and `ollama.chat.stream`.
 
+Check Gemini Developer API:
+
+```bash
+GEMINI_API_KEY=your-key aiping check \
+  --profile gemini \
+  --base-url https://generativelanguage.googleapis.com/v1beta \
+  --model gemini-2.5-flash
+```
+
 Use an API key from a flag or environment variable:
 
 ```bash
@@ -148,8 +167,9 @@ AI_PING_API_KEY=sk-test aiping check \
   --model gpt-4o-mini
 ```
 
-For the `openai` profile, `OPENAI_API_KEY` is also supported. The flag
-`--api-key` takes precedence over environment variables.
+For the `openai` profile, `OPENAI_API_KEY` is also supported. For the `gemini`
+profile, `GEMINI_API_KEY` is also supported. The flag `--api-key` takes
+precedence over environment variables.
 
 Output JSON for issue reports or CI artifacts:
 

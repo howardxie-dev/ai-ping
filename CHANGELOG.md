@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.6.0
+
+### Added
+
+- Added the `gemini` profile for Gemini Developer API REST checks.
+- Added Gemini models list, basic generation, streaming generation, and error
+  format checks.
+
+### Changed
+
+- Documented Gemini `/v1beta` base URL usage, `GEMINI_API_KEY`, and
+  `x-goog-api-key` authentication.
+- Clarified that Gemini streaming uses SSE with Gemini response chunks, not
+  OpenAI delta chunks.
+
 ## 0.5.0
 
 ### Added

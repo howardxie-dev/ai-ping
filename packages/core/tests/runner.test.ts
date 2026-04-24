@@ -29,6 +29,7 @@ describe("runChecks", () => {
     expect(listProfiles().map((profile) => profile.id)).toEqual([
       "openai",
       "ollama",
+      "gemini",
     ]);
     expect(listChecks("ollama").map((check) => check.id)).toEqual([
       "ollama.tags",
@@ -36,6 +37,12 @@ describe("runChecks", () => {
       "ollama.generate.stream",
       "ollama.chat.basic",
       "ollama.chat.stream",
+    ]);
+    expect(listChecks("gemini").map((check) => check.id)).toEqual([
+      "gemini.models.list",
+      "gemini.generate.basic",
+      "gemini.generate.stream",
+      "gemini.error.format",
     ]);
   });
 
@@ -297,6 +304,91 @@ describe("runChecks", () => {
       "http://localhost:11434/api/tags",
       expect.objectContaining({
         method: "GET",
+        headers: expect.not.objectContaining({
+          authorization: expect.any(String),
+        }),
+      }),
+    );
+  });
+
+  it("runs all Gemini checks together with x-goog-api-key auth", async () => {
+    const geminiResponse = {
+      candidates: [
+        {
+          content: { parts: [{ text: "pong" }] },
+          finishReason: "STOP",
+        },
+      ],
+      usageMetadata: { totalTokenCount: 3 },
+      modelVersion: "gemini-2.5-flash",
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse(200, {
+          models: [
+            {
+              name: "models/gemini-2.5-flash",
+              baseModelId: "gemini-2.5-flash",
+              version: "001",
+              displayName: "Gemini 2.5 Flash",
+              supportedGenerationMethods: ["generateContent"],
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(jsonResponse(200, geminiResponse))
+      .mockResolvedValueOnce(
+        sseResponse(
+          200,
+          [
+            `data: ${JSON.stringify(geminiResponse)}`,
+            "data: [DONE]",
+          ].join("\n"),
+        ),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse(400, {
+          error: {
+            code: 400,
+            message: "contents is required",
+            status: "INVALID_ARGUMENT",
+            details: [],
+          },
+        }),
+      );
+    globalThis.fetch = fetchMock;
+
+    const report = await runChecks({
+      profile: "gemini",
+      baseUrl: "https://generativelanguage.googleapis.com/v1beta",
+      model: "gemini-2.5-flash",
+      apiKey: "gemini-key",
+    });
+
+    expect(report.results.map((result) => [result.id, result.status])).toEqual([
+      ["gemini.models.list", "pass"],
+      ["gemini.generate.basic", "pass"],
+      ["gemini.generate.stream", "pass"],
+      ["gemini.error.format", "pass"],
+    ]);
+    expect(report.summary).toMatchObject({
+      passed: 4,
+      total: 4,
+      ok: true,
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://generativelanguage.googleapis.com/v1beta/models",
+      expect.objectContaining({
+        method: "GET",
+        headers: expect.objectContaining({
+          "x-goog-api-key": "gemini-key",
+        }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://generativelanguage.googleapis.com/v1beta/models",
+      expect.objectContaining({
         headers: expect.not.objectContaining({
           authorization: expect.any(String),
         }),

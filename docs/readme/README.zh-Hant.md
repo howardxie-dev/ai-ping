@@ -29,11 +29,18 @@ AI Ping 目前包含兩個核心部分：
 | --- | --- | --- | --- |
 | `openai` | OpenAI-compatible API | 通常需要 API key | SSE |
 | `ollama` | Ollama 本機 API | 預設不需要 API key | JSON lines |
+| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE |
 
 `ollama` profile 覆蓋 Ollama native `/api/tags`、`/api/generate` 和
 `/api/chat`。`/api/generate` 是 prompt-style native API，`/api/chat` 是
 messages-style native API。Ollama OpenAI-compatible `/v1/chat/completions`
 應使用 `openai` profile 檢查。
+
+`gemini` profile 覆蓋 Gemini Developer API REST，base URL 範例為
+`https://generativelanguage.googleapis.com/v1beta`。它透過 `--api-key`、
+`AI_PING_API_KEY` 或 `GEMINI_API_KEY` 使用 `x-goog-api-key` 認證。Vertex
+AI Gemini API 與 Gemini OpenAI compatibility 不屬於此 profile。Gemini
+streaming 使用 SSE，但回應 chunk 不是 OpenAI delta 格式。
 
 目前支援的檢查項：
 
@@ -42,6 +49,7 @@ messages-style native API。Ollama OpenAI-compatible `/v1/chat/completions`
 - 串流 chat completion 檢查
 - 錯誤回應格式檢查
 - Ollama checks：`ollama.tags`、`ollama.generate.basic`、`ollama.generate.stream`、`ollama.chat.basic`、`ollama.chat.stream`
+- Gemini checks：`gemini.models.list`、`gemini.generate.basic`、`gemini.generate.stream`、`gemini.error.format`
 - 結構化報告，支援 `pass`、`warn`、`fail`、`skip`
 
 npm 套件名稱是 `@starroy/ai-ping`，實際命令名稱是 `aiping`。
@@ -107,6 +115,15 @@ Ollama 不需要 API key。它的 streaming 回應使用 JSON lines，不是 SSE
 Ollama OpenAI-compatible `/v1/chat/completions` 不屬於 `ollama` native
 profile 覆蓋範圍，請使用 `openai` profile 檢查。
 
+檢查 Gemini Developer API：
+
+```bash
+GEMINI_API_KEY=your-key aiping check \
+  --profile gemini \
+  --base-url https://generativelanguage.googleapis.com/v1beta \
+  --model gemini-2.5-flash
+```
+
 透過參數或環境變數傳入 API key：
 
 ```bash
@@ -116,11 +133,12 @@ AI_PING_API_KEY=sk-test aiping check \
   --model gpt-4o-mini
 ```
 
-對於 `openai` profile，也支援 `OPENAI_API_KEY`。優先順序為：
+對於 `openai` profile，也支援 `OPENAI_API_KEY`。對於 `gemini` profile，
+也支援 `GEMINI_API_KEY`。優先順序為：
 
 1. `--api-key`
 2. `AI_PING_API_KEY`
-3. `OPENAI_API_KEY`
+3. profile 專用環境變數，例如 `OPENAI_API_KEY` 或 `GEMINI_API_KEY`
 
 輸出 JSON 報告，方便附到 issue 或 CI artifact：
 

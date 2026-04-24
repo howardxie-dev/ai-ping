@@ -12,5 +12,8 @@ export function resolveApiKey(
   if (options.profile === "openai" && options.env.OPENAI_API_KEY) {
     return options.env.OPENAI_API_KEY;
   }
+  if (options.profile === "gemini" && options.env.GEMINI_API_KEY) {
+    return options.env.GEMINI_API_KEY;
+  }
   return undefined;
 }

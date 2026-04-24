@@ -144,6 +144,47 @@ describe("runCheckCommand", () => {
     } satisfies RunChecksOptions);
   });
 
+  it("runs Gemini checks with GEMINI_API_KEY", async () => {
+    coreMocks.getProfile.mockReturnValue(
+      makeProfile({
+        id: "gemini",
+        name: "Gemini API",
+        description: "Checks common Gemini Developer API REST behaviors.",
+      }),
+    );
+    const report = makeReport({
+      profile: "gemini",
+      endpoint: "https://generativelanguage.googleapis.com/v1beta",
+      model: "gemini-2.5-flash",
+    });
+    const runChecks = vi.fn().mockResolvedValue(report);
+
+    await runCheckCommand(
+      {
+        profile: "gemini",
+        baseUrl: "https://generativelanguage.googleapis.com/v1beta",
+        model: "gemini-2.5-flash",
+      },
+      {
+        runChecks,
+        env: { GEMINI_API_KEY: "gemini-key" },
+        writeStdout: vi.fn(),
+        setExitCode: vi.fn(),
+      },
+    );
+
+    expect(runChecks).toHaveBeenCalledWith({
+      profile: "gemini",
+      baseUrl: "https://generativelanguage.googleapis.com/v1beta",
+      model: "gemini-2.5-flash",
+      apiKey: "gemini-key",
+      timeoutMs: undefined,
+      only: undefined,
+      skip: undefined,
+    } satisfies RunChecksOptions);
+  });
+
+
   it.each([
     [{ baseUrl: "https://api.example.test/v1", model: "gpt-test" }, "--profile"],
     [{ profile: "openai", model: "gpt-test" }, "--base-url"],
@@ -218,6 +259,12 @@ describe("runProfilesCommand", () => {
         description: "Checks common Ollama local API behaviors.",
         checks: [],
       }),
+      makeProfile({
+        id: "gemini",
+        name: "Gemini API",
+        description: "Checks common Gemini Developer API REST behaviors.",
+        checks: [],
+      }),
     ];
     const writeStdout = vi.fn();
     const setExitCode = vi.fn();
@@ -237,6 +284,9 @@ describe("runProfilesCommand", () => {
         "ollama",
         "  Ollama API",
         "  Checks common Ollama local API behaviors.",
+        "gemini",
+        "  Gemini API",
+        "  Checks common Gemini Developer API REST behaviors.",
       ].join("\n"),
     );
     expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);
@@ -327,6 +377,58 @@ describe("runChecksCommand", () => {
         "required     ollama.generate.stream Streaming generation",
         "required     ollama.chat.basic      Basic chat",
         "required     ollama.chat.stream     Streaming chat",
+      ].join("\n"),
+    );
+    expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);
+  });
+
+  it("lists Gemini checks for the selected profile", async () => {
+    const writeStdout = vi.fn();
+    const setExitCode = vi.fn();
+    const getProfile = vi.fn(() =>
+      makeProfile({
+        id: "gemini",
+        name: "Gemini API",
+        description: "Checks common Gemini Developer API REST behaviors.",
+      }),
+    );
+    const listChecks = vi.fn(() => [
+      makeCheck({
+        id: "gemini.models.list",
+        severity: "recommended",
+        title: "Models list",
+      }),
+      makeCheck({
+        id: "gemini.generate.basic",
+        severity: "required",
+        title: "Basic content generation",
+      }),
+      makeCheck({
+        id: "gemini.generate.stream",
+        severity: "required",
+        title: "Streaming content generation",
+      }),
+      makeCheck({
+        id: "gemini.error.format",
+        severity: "recommended",
+        title: "Error response format",
+      }),
+    ]);
+
+    await runChecksCommand(
+      { profile: "gemini" },
+      { getProfile, listChecks, writeStdout, setExitCode },
+    );
+
+    expect(getProfile).toHaveBeenCalledWith("gemini");
+    expect(listChecks).toHaveBeenCalledWith("gemini");
+    expect(writeStdout).toHaveBeenCalledWith(
+      [
+        "Checks for profile: gemini",
+        "recommended  gemini.models.list     Models list",
+        "required     gemini.generate.basic  Basic content generation",
+        "required     gemini.generate.stream Streaming content generation",
+        "recommended  gemini.error.format    Error response format",
       ].join("\n"),
     );
     expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);
