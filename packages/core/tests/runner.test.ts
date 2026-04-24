@@ -93,6 +93,12 @@ describe("runChecks", () => {
       .fn()
       .mockResolvedValueOnce(
         jsonResponse(200, {
+          object: "list",
+          data: [{ id: "test-model", object: "model", created: 1, owned_by: "ai-ping" }],
+        }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse(200, {
           choices: [{ message: { content: "pong" } }],
         }),
       )
@@ -107,15 +113,18 @@ describe("runChecks", () => {
     });
 
     expect(report.results.map((result) => result.id)).toEqual([
+      "openai.models.list",
       "openai.chat.basic",
       "openai.error.format",
     ]);
-    expect(report.results[0]).toMatchObject({ status: "warn" });
-    expect(report.results[1]).toMatchObject({
+    expect(report.results[0]).toMatchObject({ status: "pass" });
+    expect(report.results[1]).toMatchObject({ status: "warn" });
+    expect(report.results[2]).toMatchObject({
       status: "fail",
       message: "Request failed: network down",
     });
     expect(report.summary).toMatchObject({
+      passed: 1,
       warned: 1,
       failed: 1,
       requiredFailed: 0,
@@ -126,6 +135,19 @@ describe("runChecks", () => {
   it("runs all OpenAI checks together against successful mocked responses", async () => {
     const fetchMock = vi
       .fn()
+      .mockResolvedValueOnce(
+        jsonResponse(200, {
+          object: "list",
+          data: [
+            {
+              id: "test-model",
+              object: "model",
+              created: 1,
+              owned_by: "ai-ping",
+            },
+          ],
+        }),
+      )
       .mockResolvedValueOnce(
         jsonResponse(200, {
           id: "chatcmpl-1",
@@ -169,13 +191,14 @@ describe("runChecks", () => {
     });
 
     expect(report.results.map((result) => [result.id, result.status])).toEqual([
+      ["openai.models.list", "pass"],
       ["openai.chat.basic", "pass"],
       ["openai.chat.stream", "pass"],
       ["openai.error.format", "pass"],
     ]);
     expect(report.summary).toMatchObject({
-      passed: 3,
-      total: 3,
+      passed: 4,
+      total: 4,
       ok: true,
     });
   });

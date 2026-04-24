@@ -1,6 +1,7 @@
 import { openaiChatBasicCheck } from "./checks/chat-basic";
 import { openaiChatStreamCheck } from "./checks/chat-stream";
 import { openaiErrorFormatCheck } from "./checks/error-format";
+import { openaiModelsListCheck } from "./checks/models-list";
 import type { ProtocolProfile } from "../../types";
 
 export const openaiProfile: ProtocolProfile = {
@@ -8,6 +9,7 @@ export const openaiProfile: ProtocolProfile = {
   name: "OpenAI-compatible API",
   description: "Checks common OpenAI-compatible chat completion behaviors.",
   checks: [
+    openaiModelsListCheck,
     openaiChatBasicCheck,
     openaiChatStreamCheck,
     openaiErrorFormatCheck,

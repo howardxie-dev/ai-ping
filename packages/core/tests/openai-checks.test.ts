@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 import { openaiChatBasicCheck } from "../src/profiles/openai/checks/chat-basic";
 import { openaiChatStreamCheck } from "../src/profiles/openai/checks/chat-stream";
 import { openaiErrorFormatCheck } from "../src/profiles/openai/checks/error-format";
+import { openaiModelsListCheck } from "../src/profiles/openai/checks/models-list";
+import { listChecks } from "../src/registry";
 import type {
   CheckContext,
   HttpJsonResponse,
@@ -117,6 +119,126 @@ describe("openaiChatBasicCheck", () => {
 
     expect(result.status).toBe("fail");
     expect(result.message).toMatch(/usable message content/);
+  });
+});
+
+describe("openaiModelsListCheck", () => {
+  it("passes for a valid models list response", async () => {
+    const request = {
+      json: vi.fn().mockResolvedValue(
+        jsonResponse(200, {
+          object: "list",
+          data: [
+            {
+              id: "demo-model",
+              object: "model",
+              created: 1710000000,
+              owned_by: "ai-ping",
+            },
+          ],
+        }),
+      ),
+      stream: vi.fn(),
+    };
+
+    const result = await openaiModelsListCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("pass");
+    expect(request.json).toHaveBeenCalledWith({
+      method: "GET",
+      path: "/models",
+      timeoutMs: 1000,
+    });
+  });
+
+  it("warns when recommended fields are missing", async () => {
+    const request = {
+      json: vi.fn().mockResolvedValue(
+        jsonResponse(200, {
+          data: [{ id: "demo-model" }],
+        }),
+      ),
+      stream: vi.fn(),
+    };
+
+    const result = await openaiModelsListCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("warn");
+    expect(result.details?.missingRecommendedFields).toEqual([
+      "object",
+      "item.object",
+      "item.created",
+      "item.owned_by",
+    ]);
+  });
+
+  it("warns when data is an empty array", async () => {
+    const request = {
+      json: vi.fn().mockResolvedValue(
+        jsonResponse(200, {
+          object: "list",
+          data: [],
+        }),
+      ),
+      stream: vi.fn(),
+    };
+
+    const result = await openaiModelsListCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("warn");
+    expect(result.message).toMatch(/empty data array/);
+  });
+
+  it("fails when data is missing", async () => {
+    const request = {
+      json: vi.fn().mockResolvedValue(jsonResponse(200, { object: "list" })),
+      stream: vi.fn(),
+    };
+
+    const result = await openaiModelsListCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("fail");
+    expect(result.message).toMatch(/response.data/);
+  });
+
+  it("fails when data is not an array", async () => {
+    const request = {
+      json: vi.fn().mockResolvedValue(jsonResponse(200, { data: {} })),
+      stream: vi.fn(),
+    };
+
+    const result = await openaiModelsListCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("fail");
+    expect(result.message).toMatch(/response.data/);
+  });
+
+  it("fails when there is no string id", async () => {
+    const request = {
+      json: vi.fn().mockResolvedValue(
+        jsonResponse(200, {
+          data: [{ id: 123 }, { object: "model" }],
+        }),
+      ),
+      stream: vi.fn(),
+    };
+
+    const result = await openaiModelsListCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("fail");
+    expect(result.message).toMatch(/string id/);
+  });
+
+  it("fails on non-2xx responses", async () => {
+    const request = {
+      json: vi.fn().mockResolvedValue(jsonResponse(500, { error: "oops" })),
+      stream: vi.fn(),
+    };
+
+    const result = await openaiModelsListCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("fail");
+    expect(result.message).toMatch(/Expected 2xx/);
   });
 });
 
@@ -244,5 +366,16 @@ describe("openaiErrorFormatCheck", () => {
 
     expect(result.status).toBe("fail");
     expect(result.message).toMatch(/unexpectedly returned a 2xx/);
+  });
+});
+
+describe("openai profile order", () => {
+  it("lists checks in the expected v0.3 order", () => {
+    expect(listChecks("openai").map((check) => check.id)).toEqual([
+      "openai.models.list",
+      "openai.chat.basic",
+      "openai.chat.stream",
+      "openai.error.format",
+    ]);
   });
 });

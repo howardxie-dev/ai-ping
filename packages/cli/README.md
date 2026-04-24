@@ -2,6 +2,8 @@
 
 Command-line interface for AI Ping protocol checks.
 
+The npm package is `@starroy/ai-ping` and the installed command is `aiping`.
+
 ## Usage
 
 ```bash
@@ -9,6 +11,18 @@ aiping check \
   --profile openai \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini
+```
+
+Quick demo with the local mock endpoint:
+
+```bash
+pnpm install
+pnpm --filter openai-compatible-mock dev
+
+aiping check \
+  --profile openai \
+  --base-url http://localhost:3000/v1 \
+  --model demo-model
 ```
 
 Use JSON output for issue reports or CI artifacts:

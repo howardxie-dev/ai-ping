@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.3.0
+
+### Added
+
+- Added `openai.models.list` to the OpenAI-compatible profile.
+- Added a local OpenAI-compatible mock endpoint example.
+- Added a quick demo flow to the README files.
+
+### Changed
+
+- Improved CLI console report readability with counts, severity, and duration.
+
 ## 0.2.5
 
 ### Added

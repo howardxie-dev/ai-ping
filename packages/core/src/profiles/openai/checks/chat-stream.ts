@@ -1,7 +1,7 @@
 import { parseSseStream } from "../../../sse";
 import type { CheckContext, WireCheck } from "../../../types";
 import { chatCompletionPayload } from "../payloads";
-import { checkResult, failureMessage } from "./result";
+import { checkResult, failureMessage, isRecord } from "./result";
 
 const CHECK = {
   id: "openai.chat.stream",
@@ -134,8 +134,4 @@ function hasDeltaObject(chunk: unknown): boolean {
   const choices = (chunk as { choices: unknown[] }).choices;
   const firstChoice = choices[0];
   return isRecord(firstChoice) && isRecord(firstChoice.delta);
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }

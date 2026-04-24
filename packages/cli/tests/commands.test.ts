@@ -59,7 +59,7 @@ describe("runCheckCommand", () => {
       expect.stringContaining("AI Ping"),
     );
     expect(writeStdout).toHaveBeenCalledWith(
-      expect.stringContaining("severity=required category=generation durationMs=42"),
+      expect.stringContaining("required     42ms"),
     );
     expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);
   });

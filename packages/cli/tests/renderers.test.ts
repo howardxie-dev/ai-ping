@@ -14,16 +14,23 @@ describe("renderJsonReport", () => {
 });
 
 describe("renderConsoleReport", () => {
-  it("renders report metadata, results, and summary without verbose details", () => {
+  it("renders report metadata, counts, severity, duration, and summary", () => {
     const output = renderConsoleReport(
       makeReport({
         results: [
-          makeResult({ id: "chat.basic", status: "pass" }),
           makeResult({
-            id: "error.format",
+            id: "openai.models.list",
+            status: "pass",
+            severity: "recommended",
+            durationMs: 42,
+            message: "Models list response is valid.",
+          }),
+          makeResult({
+            id: "openai.chat.stream",
             status: "fail",
-            message: "error response was not compatible",
-            details: { status: 418 },
+            severity: "required",
+            durationMs: 301,
+            message: "No valid SSE data chunks were found.",
           }),
         ],
         summary: {
@@ -35,6 +42,7 @@ describe("renderConsoleReport", () => {
           requiredFailed: 1,
           ok: false,
         },
+        durationMs: 512,
       }),
     );
 
@@ -42,16 +50,18 @@ describe("renderConsoleReport", () => {
     expect(output).toContain("Profile:  openai");
     expect(output).toContain("Endpoint: https://api.example.test/v1");
     expect(output).toContain("Model:    gpt-test");
-    expect(output).toContain("PASS  chat.basic");
-    expect(output).toContain("FAIL  error.format");
-    expect(output).toContain("      error response was not compatible");
-    expect(output).not.toContain("details=");
-    expect(output).toContain("  Passed:  1");
-    expect(output).toContain("  Failed:  1");
-    expect(output).toContain("  Result:  FAILED");
+    expect(output).toContain("Checks:   2");
+    expect(output).toContain("PASS  openai.models.list");
+    expect(output).toContain("recommended  42ms");
+    expect(output).toContain("FAIL  openai.chat.stream");
+    expect(output).toContain("required     301ms");
+    expect(output).toContain("  Required: 0 passed, 1 failed");
+    expect(output).toContain("  Total:    1 passed, 0 warned, 1 failed, 0 skipped");
+    expect(output).toContain("  Duration: 512ms");
+    expect(output).toContain("  Result:   FAILED");
   });
 
-  it("includes severity, category, duration, and details in verbose mode", () => {
+  it("includes details in verbose mode", () => {
     const output = renderConsoleReport(
       makeReport({
         results: [
@@ -67,10 +77,8 @@ describe("renderConsoleReport", () => {
       { verbose: true },
     );
 
-    expect(output).toContain(
-      "      severity=recommended category=streaming durationMs=77",
-    );
-    expect(output).toContain('      details={"chunks":2}');
+    expect(output).toContain("Details:");
+    expect(output).toContain('  "chunks": 2');
   });
 
   it("pads skipped status labels to align with other statuses", () => {

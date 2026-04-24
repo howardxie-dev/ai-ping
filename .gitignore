@@ -3,6 +3,7 @@ dist/
 coverage/
 .DS_Store
 .idea/
+.npm-pack-cache/
 
 # Local design drafts
 docs/design/*.md

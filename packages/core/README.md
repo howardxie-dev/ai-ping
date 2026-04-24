@@ -2,6 +2,13 @@
 
 Reusable protocol checks for AI and LLM API endpoints.
 
+The OpenAI-compatible profile currently includes:
+
+- `openai.models.list`
+- `openai.chat.basic`
+- `openai.chat.stream`
+- `openai.error.format`
+
 ```ts
 import { runChecks } from "@starroy/ai-ping-core";
 

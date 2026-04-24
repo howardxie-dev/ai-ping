@@ -1,6 +1,6 @@
 {
   "name": "@starroy/ai-ping-core",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "Core protocol checks for AI and LLM API endpoints.",
   "license": "MIT",
   "type": "module",
@@ -43,7 +43,7 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --clean",
-    "pack:check": "pnpm build && npm pack --dry-run",
+    "pack:check": "pnpm build && npm_config_cache=../../.npm-pack-cache npm pack --dry-run",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

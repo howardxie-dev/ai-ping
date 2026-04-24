@@ -24,11 +24,15 @@ AI Ping currently includes:
 - `@starroy/ai-ping-core`, the reusable protocol checking core
 - `@starroy/ai-ping`, the CLI package that provides the `aiping` command
 - OpenAI-compatible profile
+- Models list compatibility check
 - Basic non-streaming chat completion check
 - Streaming chat completion check
 - Error response format check
 - Structured report with `pass`, `warn`, `fail`, and `skip`
 - JSON output and CI-friendly exit codes
+
+The npm package is published as `@starroy/ai-ping`, while the CLI command is
+`aiping`.
 
 ## Core Usage
 
@@ -75,6 +79,28 @@ pnpm install
 pnpm build
 pnpm --filter @starroy/ai-ping cli --help
 ```
+
+## Quick Demo
+
+Start the mock OpenAI-compatible endpoint:
+
+```bash
+pnpm install
+pnpm --filter openai-compatible-mock dev
+```
+
+In another terminal:
+
+```bash
+npm install -g @starroy/ai-ping
+
+aiping check \
+  --profile openai \
+  --base-url http://localhost:3000/v1 \
+  --model demo-model
+```
+
+This checks protocol behavior, not simple network reachability.
 
 Run protocol checks:
 

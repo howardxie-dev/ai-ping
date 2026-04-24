@@ -21,6 +21,7 @@ AI Ping 目前包含两个核心部分：
 
 - `@starroy/ai-ping-core`：可复用的协议检查核心库
 - `@starroy/ai-ping` CLI：命令行工具，提供 `aiping` 命令
+- `openai.models.list`：`/models` 最低兼容结构检查
 
 当前支持的 profile：
 
@@ -28,10 +29,13 @@ AI Ping 目前包含两个核心部分：
 
 当前支持的检查项：
 
+- `models list` 检查
 - 基础非流式 chat completion 检查
 - 流式 chat completion 检查
 - 错误响应格式检查
 - 结构化报告，支持 `pass`、`warn`、`fail`、`skip`
+
+npm 包名是 `@starroy/ai-ping`，实际命令名是 `aiping`。
 
 ## CLI 使用
 
@@ -48,6 +52,28 @@ pnpm install
 pnpm build
 pnpm --filter @starroy/ai-ping cli --help
 ```
+
+## 快速体验
+
+先启动 mock OpenAI-compatible endpoint：
+
+```bash
+pnpm install
+pnpm --filter openai-compatible-mock dev
+```
+
+再在另一个终端运行：
+
+```bash
+npm install -g @starroy/ai-ping
+
+aiping check \
+  --profile openai \
+  --base-url http://localhost:3000/v1 \
+  --model demo-model
+```
+
+AI Ping 检查的是协议行为，不是简单的网络连通性。
 
 运行协议检查：
 
