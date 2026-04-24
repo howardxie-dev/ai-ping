@@ -30,12 +30,18 @@ AI Ping 目前包含兩個核心部分：
 | `openai` | OpenAI-compatible API | 通常需要 API key | SSE |
 | `ollama` | Ollama 本機 API | 預設不需要 API key | JSON lines |
 
+`ollama` profile 覆蓋 Ollama native `/api/tags`、`/api/generate` 和
+`/api/chat`。`/api/generate` 是 prompt-style native API，`/api/chat` 是
+messages-style native API。Ollama OpenAI-compatible `/v1/chat/completions`
+應使用 `openai` profile 檢查。
+
 目前支援的檢查項：
 
 - `models list` 檢查
 - 基礎非串流 chat completion 檢查
 - 串流 chat completion 檢查
 - 錯誤回應格式檢查
+- Ollama checks：`ollama.tags`、`ollama.generate.basic`、`ollama.generate.stream`、`ollama.chat.basic`、`ollama.chat.stream`
 - 結構化報告，支援 `pass`、`warn`、`fail`、`skip`
 
 npm 套件名稱是 `@starroy/ai-ping`，實際命令名稱是 `aiping`。
@@ -97,6 +103,9 @@ aiping check \
 ```
 
 Ollama 不需要 API key。它的 streaming 回應使用 JSON lines，不是 SSE。
+
+Ollama OpenAI-compatible `/v1/chat/completions` 不屬於 `ollama` native
+profile 覆蓋範圍，請使用 `openai` profile 檢查。
 
 透過參數或環境變數傳入 API key：
 

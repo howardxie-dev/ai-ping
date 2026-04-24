@@ -300,6 +300,16 @@ describe("runChecksCommand", () => {
         severity: "required",
         title: "Streaming generation",
       }),
+      makeCheck({
+        id: "ollama.chat.basic",
+        severity: "required",
+        title: "Basic chat",
+      }),
+      makeCheck({
+        id: "ollama.chat.stream",
+        severity: "required",
+        title: "Streaming chat",
+      }),
     ]);
 
     await runChecksCommand(
@@ -315,6 +325,8 @@ describe("runChecksCommand", () => {
         "recommended  ollama.tags            Tags / models list",
         "required     ollama.generate.basic  Basic generation",
         "required     ollama.generate.stream Streaming generation",
+        "required     ollama.chat.basic      Basic chat",
+        "required     ollama.chat.stream     Streaming chat",
       ].join("\n"),
     );
     expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);

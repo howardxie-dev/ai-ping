@@ -42,6 +42,11 @@ The npm package is published as `@starroy/ai-ping`, while the CLI command is
 | `openai` | OpenAI-compatible APIs | Usually requires an API key | SSE |
 | `ollama` | Ollama local APIs | No API key by default | JSON lines |
 
+The `ollama` profile covers Ollama native `/api/tags`, `/api/generate`, and
+`/api/chat`. `/api/generate` is the prompt-style native API, while `/api/chat`
+is the messages-style native API. For Ollama's OpenAI-compatible
+`/v1/chat/completions`, use the `openai` profile instead.
+
 ## Core Usage
 
 ```ts
@@ -130,6 +135,9 @@ aiping check \
 
 Ollama does not require an API key. Its streaming responses use JSON lines, not
 SSE.
+
+Ollama checks currently include `ollama.tags`, `ollama.generate.basic`,
+`ollama.generate.stream`, `ollama.chat.basic`, and `ollama.chat.stream`.
 
 Use an API key from a flag or environment variable:
 

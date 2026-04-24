@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.5.0
+
+### Added
+
+- Added Ollama native chat checks for `/api/chat`.
+
+### Changed
+
+- Documented that the Ollama profile covers `/api/tags`, `/api/generate`, and
+  `/api/chat`.
+- Clarified that Ollama `/api/generate` is a prompt-style native API, while
+  `/api/chat` is a messages-style native API.
+- Clarified that Ollama OpenAI-compatible `/v1/chat/completions` should be
+  checked with the `openai` profile.
+
 ## 0.4.0
 
 ### Added

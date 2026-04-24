@@ -34,6 +34,8 @@ describe("runChecks", () => {
       "ollama.tags",
       "ollama.generate.basic",
       "ollama.generate.stream",
+      "ollama.chat.basic",
+      "ollama.chat.stream",
     ]);
   });
 
@@ -250,6 +252,26 @@ describe("runChecks", () => {
             headers: { "content-type": "application/x-ndjson" },
           },
         ),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse(200, {
+          model: "llama3.2",
+          created_at: "2026-04-24T00:00:00Z",
+          message: { role: "assistant", content: "pong" },
+          done: true,
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          [
+            '{"model":"llama3.2","created_at":"2026-04-24T00:00:00Z","message":{"role":"assistant","content":"po"},"done":false}',
+            '{"model":"llama3.2","created_at":"2026-04-24T00:00:00Z","message":{"role":"assistant","content":"ng"},"done":true}',
+          ].join("\n"),
+          {
+            status: 200,
+            headers: { "content-type": "application/x-ndjson" },
+          },
+        ),
       );
     globalThis.fetch = fetchMock;
 
@@ -263,10 +285,12 @@ describe("runChecks", () => {
       ["ollama.tags", "pass"],
       ["ollama.generate.basic", "pass"],
       ["ollama.generate.stream", "pass"],
+      ["ollama.chat.basic", "pass"],
+      ["ollama.chat.stream", "pass"],
     ]);
     expect(report.summary).toMatchObject({
-      passed: 3,
-      total: 3,
+      passed: 5,
+      total: 5,
       ok: true,
     });
     expect(fetchMock).toHaveBeenCalledWith(

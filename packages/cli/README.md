@@ -44,6 +44,14 @@ aiping check \
 Ollama does not require an API key. Its streaming responses use JSON lines, not
 SSE.
 
+The `ollama` profile checks Ollama native `/api/tags`, `/api/generate`, and
+`/api/chat`. `/api/generate` is the prompt-style native API, while `/api/chat`
+is the messages-style native API. For Ollama's OpenAI-compatible
+`/v1/chat/completions`, use the `openai` profile instead.
+
+Ollama checks currently include `ollama.tags`, `ollama.generate.basic`,
+`ollama.generate.stream`, `ollama.chat.basic`, and `ollama.chat.stream`.
+
 Use JSON output for issue reports or CI artifacts:
 
 ```bash

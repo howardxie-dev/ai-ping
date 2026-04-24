@@ -21,6 +21,13 @@ The Ollama profile currently includes:
 - `ollama.tags`
 - `ollama.generate.basic`
 - `ollama.generate.stream`
+- `ollama.chat.basic`
+- `ollama.chat.stream`
+
+This covers Ollama native `/api/tags`, `/api/generate`, and `/api/chat`.
+`/api/generate` is Ollama's prompt-style native API, while `/api/chat` is its
+messages-style native API. For Ollama's OpenAI-compatible
+`/v1/chat/completions`, use the `openai` profile instead.
 
 ```ts
 import { runChecks } from "@starroy/ai-ping-core";

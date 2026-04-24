@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
+import { ollamaChatBasicCheck } from "../src/profiles/ollama/checks/chat-basic";
+import { ollamaChatStreamCheck } from "../src/profiles/ollama/checks/chat-stream";
 import { ollamaGenerateBasicCheck } from "../src/profiles/ollama/checks/generate-basic";
 import { ollamaGenerateStreamCheck } from "../src/profiles/ollama/checks/generate-stream";
 import { ollamaTagsCheck } from "../src/profiles/ollama/checks/tags";
@@ -328,6 +330,264 @@ describe("ollamaGenerateStreamCheck", () => {
     };
 
     const result = await ollamaGenerateStreamCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("fail");
+    expect(result.message).toMatch(/Expected 2xx/);
+  });
+});
+
+describe("ollamaChatBasicCheck", () => {
+  it("passes for a valid chat response", async () => {
+    const request = {
+      json: vi.fn().mockResolvedValue(
+        jsonResponse(200, {
+          model: "llama3.2",
+          created_at: "2026-04-24T00:00:00Z",
+          message: { role: "assistant", content: "pong" },
+          done: true,
+        }),
+      ),
+      stream: vi.fn(),
+    };
+
+    const result = await ollamaChatBasicCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("pass");
+    expect(request.json).toHaveBeenCalledWith({
+      method: "POST",
+      path: "/api/chat",
+      timeoutMs: 1000,
+      body: {
+        model: "llama3.2",
+        messages: [{ role: "user", content: "Reply with exactly: pong" }],
+        stream: false,
+      },
+    });
+  });
+
+  it("warns for an empty message content string", async () => {
+    const request = {
+      json: vi.fn().mockResolvedValue(
+        jsonResponse(200, {
+          model: "llama3.2",
+          created_at: "2026-04-24T00:00:00Z",
+          message: { role: "assistant", content: "" },
+          done: true,
+        }),
+      ),
+      stream: vi.fn(),
+    };
+
+    const result = await ollamaChatBasicCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("warn");
+    expect(result.message).toMatch(/empty message content/);
+  });
+
+  it("warns when recommended fields are missing", async () => {
+    const request = {
+      json: vi.fn().mockResolvedValue(
+        jsonResponse(200, {
+          message: { content: "pong" },
+        }),
+      ),
+      stream: vi.fn(),
+    };
+
+    const result = await ollamaChatBasicCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("warn");
+    expect(result.details?.missingRecommendedFields).toEqual([
+      "done",
+      "model",
+      "created_at",
+      "message.role",
+    ]);
+  });
+
+  it("fails when message is missing or not an object", async () => {
+    const missingRequest = {
+      json: vi.fn().mockResolvedValue(jsonResponse(200, {})),
+      stream: vi.fn(),
+    };
+    const invalidRequest = {
+      json: vi.fn().mockResolvedValue(jsonResponse(200, { message: "pong" })),
+      stream: vi.fn(),
+    };
+
+    await expect(
+      ollamaChatBasicCheck.run(mockContext({ request: missingRequest })),
+    ).resolves.toMatchObject({ status: "fail" });
+    await expect(
+      ollamaChatBasicCheck.run(mockContext({ request: invalidRequest })),
+    ).resolves.toMatchObject({ status: "fail" });
+  });
+
+  it("fails when message content is missing or not a string", async () => {
+    const missingRequest = {
+      json: vi.fn().mockResolvedValue(jsonResponse(200, { message: {} })),
+      stream: vi.fn(),
+    };
+    const invalidRequest = {
+      json: vi.fn().mockResolvedValue(
+        jsonResponse(200, { message: { content: 1 } }),
+      ),
+      stream: vi.fn(),
+    };
+
+    await expect(
+      ollamaChatBasicCheck.run(mockContext({ request: missingRequest })),
+    ).resolves.toMatchObject({ status: "fail" });
+    await expect(
+      ollamaChatBasicCheck.run(mockContext({ request: invalidRequest })),
+    ).resolves.toMatchObject({ status: "fail" });
+  });
+
+  it("fails on non-2xx responses", async () => {
+    const request = {
+      json: vi.fn().mockResolvedValue(jsonResponse(500, { error: "oops" })),
+      stream: vi.fn(),
+    };
+
+    const result = await ollamaChatBasicCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("fail");
+    expect(result.message).toMatch(/Expected 2xx/);
+  });
+});
+
+describe("ollamaChatStreamCheck", () => {
+  it("passes for a valid JSON lines chat stream", async () => {
+    const rawText = [
+      '{"model":"llama3.2","created_at":"2026-04-24T00:00:00Z","message":{"role":"assistant","content":"po"},"done":false}',
+      '{"model":"llama3.2","created_at":"2026-04-24T00:00:00Z","message":{"role":"assistant","content":"ng"},"done":true}',
+    ].join("\n");
+    const request = {
+      json: vi.fn(),
+      stream: vi.fn().mockResolvedValue(streamResponse(200, rawText)),
+    };
+
+    const result = await ollamaChatStreamCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("pass");
+    expect(request.stream).toHaveBeenCalledWith({
+      method: "POST",
+      path: "/api/chat",
+      timeoutMs: 1000,
+      body: {
+        model: "llama3.2",
+        messages: [{ role: "user", content: "Reply with exactly: pong" }],
+        stream: true,
+      },
+    });
+  });
+
+  it("warns when done true is missing", async () => {
+    const request = {
+      json: vi.fn(),
+      stream: vi.fn().mockResolvedValue(
+        streamResponse(
+          200,
+          '{"model":"llama3.2","created_at":"2026-04-24T00:00:00Z","message":{"content":"pong"}}',
+        ),
+      ),
+    };
+
+    const result = await ollamaChatStreamCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("warn");
+    expect(result.details?.hasDone).toBe(false);
+  });
+
+  it("warns when part of the stream is invalid JSON", async () => {
+    const request = {
+      json: vi.fn(),
+      stream: vi.fn().mockResolvedValue(
+        streamResponse(
+          200,
+          [
+            '{"model":"llama3.2","created_at":"2026-04-24T00:00:00Z","message":{"content":"po"},"done":false}',
+            "not-json",
+            '{"model":"llama3.2","created_at":"2026-04-24T00:00:00Z","message":{"content":"ng"},"done":true}',
+          ].join("\n"),
+        ),
+      ),
+    };
+
+    const result = await ollamaChatStreamCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("warn");
+    expect(result.details?.invalidLineCount).toBe(1);
+  });
+
+  it("warns when recommended fields are missing", async () => {
+    const request = {
+      json: vi.fn(),
+      stream: vi.fn().mockResolvedValue(
+        streamResponse(
+          200,
+          [
+            '{"message":{"content":"po"},"done":false}',
+            '{"message":{"content":"ng"},"done":true}',
+          ].join("\n"),
+        ),
+      ),
+    };
+
+    const result = await ollamaChatStreamCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("warn");
+    expect(result.details?.missingRecommendedFields).toEqual([
+      "model",
+      "created_at",
+    ]);
+  });
+
+  it("fails when there are no JSON objects", async () => {
+    const request = {
+      json: vi.fn(),
+      stream: vi.fn().mockResolvedValue(streamResponse(200, "not-json")),
+    };
+
+    const result = await ollamaChatStreamCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("fail");
+    expect(result.message).toMatch(/valid JSON line/);
+  });
+
+  it("fails when there is no message object", async () => {
+    const request = {
+      json: vi.fn(),
+      stream: vi.fn().mockResolvedValue(streamResponse(200, '{"done":true}')),
+    };
+
+    const result = await ollamaChatStreamCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("fail");
+    expect(result.message).toMatch(/message object/);
+  });
+
+  it("fails when there is no message content chunk", async () => {
+    const request = {
+      json: vi.fn(),
+      stream: vi.fn().mockResolvedValue(
+        streamResponse(200, '{"message":{"role":"assistant"},"done":true}'),
+      ),
+    };
+
+    const result = await ollamaChatStreamCheck.run(mockContext({ request }));
+
+    expect(result.status).toBe("fail");
+    expect(result.message).toMatch(/message.content/);
+  });
+
+  it("fails on non-2xx responses", async () => {
+    const request = {
+      json: vi.fn(),
+      stream: vi.fn().mockResolvedValue(streamResponse(500, '{"error":"oops"}')),
+    };
+
+    const result = await ollamaChatStreamCheck.run(mockContext({ request }));
 
     expect(result.status).toBe("fail");
     expect(result.message).toMatch(/Expected 2xx/);
