@@ -4,6 +4,13 @@ Command-line interface for AI Ping protocol checks.
 
 The npm package is `@starroy/ai-ping` and the installed command is `aiping`.
 
+## Supported profiles
+
+| Profile | API style | Authentication | Streaming |
+| --- | --- | --- | --- |
+| `openai` | OpenAI-compatible APIs | Usually requires an API key | SSE |
+| `ollama` | Ollama local APIs | No API key by default | JSON lines |
+
 ## Usage
 
 ```bash
@@ -24,6 +31,18 @@ aiping check \
   --base-url http://localhost:3000/v1 \
   --model demo-model
 ```
+
+Check a local Ollama endpoint:
+
+```bash
+aiping check \
+  --profile ollama \
+  --base-url http://localhost:11434 \
+  --model llama3.2
+```
+
+Ollama does not require an API key. Its streaming responses use JSON lines, not
+SSE.
 
 Use JSON output for issue reports or CI artifacts:
 

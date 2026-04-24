@@ -1,6 +1,6 @@
 {
   "name": "@starroy/ai-ping-core",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Core protocol checks for AI and LLM API endpoints.",
   "license": "MIT",
   "type": "module",

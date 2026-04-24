@@ -1,7 +1,8 @@
 import { openaiProfile } from "./profiles/openai";
+import { ollamaProfile } from "./profiles/ollama";
 import type { ProtocolProfile, WireCheck } from "./types";
 
-const profiles: ProtocolProfile[] = [openaiProfile];
+const profiles: ProtocolProfile[] = [openaiProfile, ollamaProfile];
 
 export function listProfiles(): ProtocolProfile[] {
   return profiles;

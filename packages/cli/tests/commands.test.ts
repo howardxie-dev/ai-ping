@@ -104,6 +104,46 @@ describe("runCheckCommand", () => {
     expect(setExitCode).toHaveBeenCalledWith(EXIT_CHECK_FAILED);
   });
 
+  it("runs Ollama checks without requiring an API key", async () => {
+    coreMocks.getProfile.mockReturnValue(
+      makeProfile({
+        id: "ollama",
+        name: "Ollama API",
+        description: "Checks common Ollama local API behaviors.",
+      }),
+    );
+    const report = makeReport({
+      profile: "ollama",
+      endpoint: "http://localhost:11434",
+      model: "llama3.2",
+    });
+    const runChecks = vi.fn().mockResolvedValue(report);
+
+    await runCheckCommand(
+      {
+        profile: "ollama",
+        baseUrl: "http://localhost:11434",
+        model: "llama3.2",
+      },
+      {
+        runChecks,
+        env: {},
+        writeStdout: vi.fn(),
+        setExitCode: vi.fn(),
+      },
+    );
+
+    expect(runChecks).toHaveBeenCalledWith({
+      profile: "ollama",
+      baseUrl: "http://localhost:11434",
+      model: "llama3.2",
+      apiKey: undefined,
+      timeoutMs: undefined,
+      only: undefined,
+      skip: undefined,
+    } satisfies RunChecksOptions);
+  });
+
   it.each([
     [{ baseUrl: "https://api.example.test/v1", model: "gpt-test" }, "--profile"],
     [{ profile: "openai", model: "gpt-test" }, "--base-url"],
@@ -173,9 +213,9 @@ describe("runProfilesCommand", () => {
         description: "OpenAI-compatible APIs",
       }),
       makeProfile({
-        id: "other",
-        name: "Other profile",
-        description: "Another profile",
+        id: "ollama",
+        name: "Ollama API",
+        description: "Checks common Ollama local API behaviors.",
         checks: [],
       }),
     ];
@@ -194,9 +234,9 @@ describe("runProfilesCommand", () => {
         "openai",
         "  OpenAI-compatible",
         "  OpenAI-compatible APIs",
-        "other",
-        "  Other profile",
-        "  Another profile",
+        "ollama",
+        "  Ollama API",
+        "  Checks common Ollama local API behaviors.",
       ].join("\n"),
     );
     expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);
@@ -229,6 +269,52 @@ describe("runChecksCommand", () => {
         "Checks for profile: openai",
         "required     chat.basic             Chat basic",
         "recommended  chat.stream            Chat streaming",
+      ].join("\n"),
+    );
+    expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);
+  });
+
+  it("lists Ollama checks for the selected profile", async () => {
+    const writeStdout = vi.fn();
+    const setExitCode = vi.fn();
+    const getProfile = vi.fn(() =>
+      makeProfile({
+        id: "ollama",
+        name: "Ollama API",
+        description: "Checks common Ollama local API behaviors.",
+      }),
+    );
+    const listChecks = vi.fn(() => [
+      makeCheck({
+        id: "ollama.tags",
+        severity: "recommended",
+        title: "Tags / models list",
+      }),
+      makeCheck({
+        id: "ollama.generate.basic",
+        severity: "required",
+        title: "Basic generation",
+      }),
+      makeCheck({
+        id: "ollama.generate.stream",
+        severity: "required",
+        title: "Streaming generation",
+      }),
+    ]);
+
+    await runChecksCommand(
+      { profile: "ollama" },
+      { getProfile, listChecks, writeStdout, setExitCode },
+    );
+
+    expect(getProfile).toHaveBeenCalledWith("ollama");
+    expect(listChecks).toHaveBeenCalledWith("ollama");
+    expect(writeStdout).toHaveBeenCalledWith(
+      [
+        "Checks for profile: ollama",
+        "recommended  ollama.tags            Tags / models list",
+        "required     ollama.generate.basic  Basic generation",
+        "required     ollama.generate.stream Streaming generation",
       ].join("\n"),
     );
     expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);

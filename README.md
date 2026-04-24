@@ -24,6 +24,7 @@ AI Ping currently includes:
 - `@starroy/ai-ping-core`, the reusable protocol checking core
 - `@starroy/ai-ping`, the CLI package that provides the `aiping` command
 - OpenAI-compatible profile
+- Ollama profile
 - Models list compatibility check
 - Basic non-streaming chat completion check
 - Streaming chat completion check
@@ -33,6 +34,13 @@ AI Ping currently includes:
 
 The npm package is published as `@starroy/ai-ping`, while the CLI command is
 `aiping`.
+
+## Supported Profiles
+
+| Profile | API style | Authentication | Streaming |
+| --- | --- | --- | --- |
+| `openai` | OpenAI-compatible APIs | Usually requires an API key | SSE |
+| `ollama` | Ollama local APIs | No API key by default | JSON lines |
 
 ## Core Usage
 
@@ -110,6 +118,18 @@ aiping check \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini
 ```
+
+Check a local Ollama endpoint:
+
+```bash
+aiping check \
+  --profile ollama \
+  --base-url http://localhost:11434 \
+  --model llama3.2
+```
+
+Ollama does not require an API key. Its streaming responses use JSON lines, not
+SSE.
 
 Use an API key from a flag or environment variable:
 

@@ -25,7 +25,10 @@ AI Ping 目前包含两个核心部分：
 
 当前支持的 profile：
 
-- `openai`：OpenAI-compatible API
+| Profile | API 形态 | 认证 | Streaming |
+| --- | --- | --- | --- |
+| `openai` | OpenAI-compatible API | 通常需要 API key | SSE |
+| `ollama` | Ollama 本地 API | 默认不需要 API key | JSON lines |
 
 当前支持的检查项：
 
@@ -83,6 +86,17 @@ aiping check \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini
 ```
+
+检查本地 Ollama endpoint：
+
+```bash
+aiping check \
+  --profile ollama \
+  --base-url http://localhost:11434 \
+  --model llama3.2
+```
+
+Ollama 不需要 API key。它的 streaming 响应使用 JSON lines，不是 SSE。
 
 通过参数或环境变量传入 API key：
 

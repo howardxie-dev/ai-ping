@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { listChecks, listProfiles } from "../src/registry";
 import { runChecks } from "../src/runner";
 import { AiPingConfigError } from "../src/types";
 
@@ -24,6 +25,18 @@ function sseResponse(status: number, rawText: string): Response {
 }
 
 describe("runChecks", () => {
+  it("lists supported profiles and Ollama checks in registry order", () => {
+    expect(listProfiles().map((profile) => profile.id)).toEqual([
+      "openai",
+      "ollama",
+    ]);
+    expect(listChecks("ollama").map((check) => check.id)).toEqual([
+      "ollama.tags",
+      "ollama.generate.basic",
+      "ollama.generate.stream",
+    ]);
+  });
+
   it("validates required options and known profiles", async () => {
     await expect(
       runChecks({
@@ -201,5 +214,69 @@ describe("runChecks", () => {
       total: 4,
       ok: true,
     });
+  });
+
+  it("runs all Ollama checks together without an API key", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse(200, {
+          models: [
+            {
+              name: "llama3.2",
+              modified_at: "2026-04-24T00:00:00Z",
+              size: 123,
+              digest: "sha256:abc",
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse(200, {
+          response: "pong",
+          done: true,
+          total_duration: 1,
+          eval_count: 1,
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          [
+            '{"response":"po","done":false}',
+            '{"response":"ng","done":true,"total_duration":1,"eval_count":1}',
+          ].join("\n"),
+          {
+            status: 200,
+            headers: { "content-type": "application/x-ndjson" },
+          },
+        ),
+      );
+    globalThis.fetch = fetchMock;
+
+    const report = await runChecks({
+      profile: "ollama",
+      baseUrl: "http://localhost:11434",
+      model: "llama3.2",
+    });
+
+    expect(report.results.map((result) => [result.id, result.status])).toEqual([
+      ["ollama.tags", "pass"],
+      ["ollama.generate.basic", "pass"],
+      ["ollama.generate.stream", "pass"],
+    ]);
+    expect(report.summary).toMatchObject({
+      passed: 3,
+      total: 3,
+      ok: true,
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:11434/api/tags",
+      expect.objectContaining({
+        method: "GET",
+        headers: expect.not.objectContaining({
+          authorization: expect.any(String),
+        }),
+      }),
+    );
   });
 });

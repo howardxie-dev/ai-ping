@@ -37,7 +37,7 @@ describe("resolveApiKey", () => {
 
     expect(
       resolveApiKey({
-        profile: "anthropic",
+        profile: "ollama",
         env: { OPENAI_API_KEY: "openai-key" },
       }),
     ).toBeUndefined();

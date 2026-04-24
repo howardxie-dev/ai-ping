@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.4.0
+
+### Added
+
+- Added the `ollama` profile alongside `openai`.
+- Added Ollama usage examples to the README files.
+
+### Changed
+
+- Documented supported profiles and Ollama streaming as JSON lines, not SSE.
+
 ## 0.3.0
 
 ### Added
