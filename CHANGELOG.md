@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.9.0
+
+### Added
+
+- Added the `openai-responses` profile for OpenAI-compatible Responses API
+  checks.
+- Added Responses checks for models list, basic responses, streaming responses,
+  and error response format.
+- Documented the boundary between `openai-chat`, `openai-responses`, and the
+  backward-compatible `openai` alias.
+
+### Changed
+
+- Updated CLI profile/check listing tests for `openai-responses`.
+- Updated README files with Responses API examples and check IDs.
+
+### Notes
+
+- `openai-responses` uses Responses-style `input`, `output`, `output_text`, and
+  semantic SSE events. It does not check Responses tools in v0.9.
+- The `openai` alias still points to `openai-chat`.
+
 ## 0.8.1
 
 ### Changed

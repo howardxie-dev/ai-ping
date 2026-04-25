@@ -24,6 +24,7 @@ AI Ping currently includes:
 - `@starroy/ai-ping-core`, the reusable protocol checking core
 - `@starroy/ai-ping`, the CLI package that provides the `aiping` command
 - OpenAI-compatible Chat Completions profile
+- OpenAI-compatible Responses profile
 - Ollama profile
 - Gemini Developer API profile
 - Anthropic Claude Messages API profile
@@ -43,6 +44,7 @@ The npm package is published as `@starroy/ai-ping`, while the CLI command is
 | Profile | API style | Authentication | Streaming | Alias |
 | --- | --- | --- | --- | --- |
 | `openai-chat` | OpenAI-compatible Chat Completions API | Usually requires an API key | SSE | `openai` |
+| `openai-responses` | OpenAI-compatible Responses API | Usually requires an API key | Semantic SSE events | |
 | `ollama` | Ollama local APIs | No API key by default | JSON lines | |
 | `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE | |
 | `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE | |
@@ -70,8 +72,14 @@ profile.
 
 The `openai-chat` profile covers OpenAI-compatible Chat Completions APIs. The
 older `openai` profile name remains supported as a backward-compatible alias.
-Future OpenAI Responses API checks will use a separate profile and are not
-included yet.
+It sends Chat Completions-style `messages` requests and validates
+`choices[].message` / `choices[].delta` responses.
+
+The `openai-responses` profile covers OpenAI-compatible Responses APIs under
+`POST /responses`. It sends Responses-style `input` requests and validates
+Responses-style `output`, `output_text`, and semantic streaming events such as
+`response.output_text.delta`. It does not check Responses tools, built-in tools,
+multimodal input, or conversation state in v0.9.
 
 The `openai-chat` profile includes recommended checks for modern Chat
 Completions `tools` / `tool_calls`. These checks verify both non-streaming
@@ -170,6 +178,20 @@ Tool call checks are `recommended`: failures help diagnose agent and client
 compatibility, but they do not fail the overall result while required checks
 pass.
 
+Check OpenAI Responses API:
+
+```bash
+OPENAI_API_KEY=your-key aiping check \
+  --profile openai-responses \
+  --base-url https://api.openai.com/v1 \
+  --model gpt-5.1-mini
+```
+
+Responses checks currently include `openai-responses.models.list`,
+`openai-responses.responses.basic`, `openai-responses.responses.stream`, and
+`openai-responses.error.format`. This profile uses `input`, not `messages`, and
+Responses streaming is semantic SSE events, not Chat Completions delta chunks.
+
 Check a local Ollama endpoint:
 
 ```bash
@@ -212,11 +234,11 @@ AI_PING_API_KEY=sk-test aiping check \
   --model gpt-4o-mini
 ```
 
-For the `openai-chat` profile, `OPENAI_API_KEY` is also supported. The legacy
-`openai` alias keeps the same environment variable behavior. For the `gemini`
-profile, `GEMINI_API_KEY` is also supported. For the `anthropic` profile,
-`ANTHROPIC_API_KEY` is also supported. The flag `--api-key` takes precedence
-over environment variables.
+For the `openai-chat` and `openai-responses` profiles, `OPENAI_API_KEY` is also
+supported. The legacy `openai` alias keeps the same environment variable
+behavior as `openai-chat`. For the `gemini` profile, `GEMINI_API_KEY` is also
+supported. For the `anthropic` profile, `ANTHROPIC_API_KEY` is also supported.
+The flag `--api-key` takes precedence over environment variables.
 
 Output JSON for issue reports or CI artifacts:
 
@@ -233,6 +255,7 @@ List available profiles and checks:
 ```bash
 aiping profiles
 aiping checks --profile openai-chat
+aiping checks --profile openai-responses
 ```
 
 Limit checks:

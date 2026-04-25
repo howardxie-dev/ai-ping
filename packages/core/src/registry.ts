@@ -1,4 +1,5 @@
 import { openaiChatProfile } from "./profiles/openai";
+import { openaiResponsesProfile } from "./profiles/openai-responses";
 import { ollamaProfile } from "./profiles/ollama";
 import { geminiProfile } from "./profiles/gemini";
 import { anthropicProfile } from "./profiles/anthropic";
@@ -6,6 +7,7 @@ import type { ProtocolProfile, WireCheck } from "./types";
 
 const profiles: ProtocolProfile[] = [
   openaiChatProfile,
+  openaiResponsesProfile,
   ollamaProfile,
   geminiProfile,
   anthropicProfile,

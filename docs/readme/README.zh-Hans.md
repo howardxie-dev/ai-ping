@@ -22,12 +22,14 @@ AI Ping 目前包含两个核心部分：
 - `@starroy/ai-ping-core`：可复用的协议检查核心库
 - `@starroy/ai-ping` CLI：命令行工具，提供 `aiping` 命令
 - `openai-chat.models.list`：`/models` 最低兼容结构检查
+- `openai-responses`：OpenAI-compatible Responses API 检查
 
 当前支持的 profile：
 
 | Profile | API 形态 | 认证 | Streaming | Alias |
 | --- | --- | --- | --- | --- |
 | `openai-chat` | OpenAI-compatible Chat Completions API | 通常需要 API key | SSE | `openai` |
+| `openai-responses` | OpenAI-compatible Responses API | 通常需要 API key | semantic SSE events | |
 | `ollama` | Ollama 本地 API | 默认不需要 API key | JSON lines | |
 | `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE | |
 | `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE | |
@@ -55,6 +57,8 @@ Bedrock Anthropic 与 Vertex AI Anthropic 不属于此 profile。
 - `models list` 检查
 - 基础非流式 chat completion 检查
 - 流式 chat completion 检查
+- 基础非流式 Responses API 检查
+- 流式 Responses API 检查
 - OpenAI-compatible modern tool calls 检查
 - 错误响应格式检查
 - Ollama checks：`ollama.tags`、`ollama.generate.basic`、`ollama.generate.stream`、`ollama.chat.basic`、`ollama.chat.stream`
@@ -63,8 +67,15 @@ Bedrock Anthropic 与 Vertex AI Anthropic 不属于此 profile。
 - 结构化报告，支持 `pass`、`warn`、`fail`、`skip`
 
 `openai-chat` 是 OpenAI-compatible Chat Completions 的规范 profile 名称。
-旧的 `openai` 名称仍作为向后兼容 alias 可用。未来 OpenAI Responses API
-检查会使用独立的 `openai-responses` profile，目前尚未包含。
+旧的 `openai` 名称仍作为向后兼容 alias 可用。它发送 Chat
+Completions 风格的 `messages` 请求，并检查 `choices[].message` /
+`choices[].delta` 响应。
+
+`openai-responses` profile 覆盖 OpenAI-compatible Responses API 的
+`POST /responses`。它发送 Responses 风格的 `input` 请求，并检查
+Responses 风格的 `output`、`output_text` 和 `response.output_text.delta`
+等 semantic streaming events。v0.9 不检查 Responses tools、built-in
+tools、multimodal input 或 conversation state。
 
 `openai-chat` profile 包含 modern Chat Completions `tools` / `tool_calls` 的
 recommended checks。它会检查非流式 `choices[].message.tool_calls`，也会检查
@@ -133,6 +144,21 @@ aiping check \
 tool call checks 是 `recommended`，用于诊断 agent / client 兼容性。只要
 required checks 通过，它们失败也不会让整体结果变成非 OK。
 
+检查 OpenAI Responses API：
+
+```bash
+OPENAI_API_KEY=your-key aiping check \
+  --profile openai-responses \
+  --base-url https://api.openai.com/v1 \
+  --model gpt-5.1-mini
+```
+
+Responses checks 目前包含 `openai-responses.models.list`、
+`openai-responses.responses.basic`、`openai-responses.responses.stream` 和
+`openai-responses.error.format`。这个 profile 使用 `input`，不是
+`messages`；Responses streaming 是 semantic SSE events，不是 Chat
+Completions delta chunks。
+
 检查本地 Ollama endpoint：
 
 ```bash
@@ -174,9 +200,10 @@ AI_PING_API_KEY=sk-test aiping check \
   --model gpt-4o-mini
 ```
 
-对于 `openai-chat` profile，也支持 `OPENAI_API_KEY`。旧的 `openai` alias
-保留相同的环境变量行为。对于 `gemini` profile，也支持 `GEMINI_API_KEY`。
-对于 `anthropic` profile，也支持 `ANTHROPIC_API_KEY`。优先级为：
+对于 `openai-chat` 和 `openai-responses` profile，也支持
+`OPENAI_API_KEY`。旧的 `openai` alias 保留与 `openai-chat` 相同的环境变量
+行为。对于 `gemini` profile，也支持 `GEMINI_API_KEY`。对于 `anthropic`
+profile，也支持 `ANTHROPIC_API_KEY`。优先级为：
 
 1. `--api-key`
 2. `AI_PING_API_KEY`
@@ -197,6 +224,7 @@ aiping check \
 ```bash
 aiping profiles
 aiping checks --profile openai-chat
+aiping checks --profile openai-responses
 ```
 
 只运行部分 checks：

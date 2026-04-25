@@ -295,6 +295,12 @@ describe("runProfilesCommand", () => {
         description: "Checks OpenAI-compatible Chat Completions API behavior.",
       }),
       makeProfile({
+        id: "openai-responses",
+        name: "OpenAI Responses API",
+        description: "Checks OpenAI-compatible Responses API behavior.",
+        checks: [],
+      }),
+      makeProfile({
         id: "ollama",
         name: "Ollama API",
         description: "Checks common Ollama local API behaviors.",
@@ -329,6 +335,9 @@ describe("runProfilesCommand", () => {
         "  OpenAI Chat Completions",
         "  Checks OpenAI-compatible Chat Completions API behavior.",
         "  Aliases: openai",
+        "openai-responses",
+        "  OpenAI Responses API",
+        "  Checks OpenAI-compatible Responses API behavior.",
         "ollama",
         "  Ollama API",
         "  Checks common Ollama local API behaviors.",
@@ -426,6 +435,58 @@ describe("runChecksCommand", () => {
         "recommended  openai-chat.tool_calls.basic Basic tool calls",
         "recommended  openai-chat.tool_calls.stream Streaming tool calls",
         "recommended  openai-chat.error.format Error response format",
+      ].join("\n"),
+    );
+    expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);
+  });
+
+  it("lists OpenAI Responses checks for the selected profile", async () => {
+    const writeStdout = vi.fn();
+    const setExitCode = vi.fn();
+    const getProfile = vi.fn(() =>
+      makeProfile({
+        id: "openai-responses",
+        name: "OpenAI Responses API",
+        description: "Checks OpenAI-compatible Responses API behavior.",
+      }),
+    );
+    const listChecks = vi.fn(() => [
+      makeCheck({
+        id: "openai-responses.models.list",
+        severity: "recommended",
+        title: "Models list",
+      }),
+      makeCheck({
+        id: "openai-responses.responses.basic",
+        severity: "required",
+        title: "Basic response",
+      }),
+      makeCheck({
+        id: "openai-responses.responses.stream",
+        severity: "required",
+        title: "Streaming response",
+      }),
+      makeCheck({
+        id: "openai-responses.error.format",
+        severity: "recommended",
+        title: "Error response format",
+      }),
+    ]);
+
+    await runChecksCommand(
+      { profile: "openai-responses" },
+      { getProfile, listChecks, writeStdout, setExitCode },
+    );
+
+    expect(getProfile).toHaveBeenCalledWith("openai-responses");
+    expect(listChecks).toHaveBeenCalledWith("openai-responses");
+    expect(writeStdout).toHaveBeenCalledWith(
+      [
+        "Checks for profile: openai-responses",
+        "recommended  openai-responses.models.list Models list",
+        "required     openai-responses.responses.basic Basic response",
+        "required     openai-responses.responses.stream Streaming response",
+        "recommended  openai-responses.error.format Error response format",
       ].join("\n"),
     );
     expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);

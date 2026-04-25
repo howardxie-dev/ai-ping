@@ -10,7 +10,9 @@ export function resolveApiKey(
   if (options.explicitApiKey) return options.explicitApiKey;
   if (options.env.AI_PING_API_KEY) return options.env.AI_PING_API_KEY;
   if (
-    (options.profile === "openai" || options.profile === "openai-chat") &&
+    (options.profile === "openai" ||
+      options.profile === "openai-chat" ||
+      options.profile === "openai-responses") &&
     options.env.OPENAI_API_KEY
   ) {
     return options.env.OPENAI_API_KEY;

@@ -28,6 +28,7 @@ describe("runChecks", () => {
   it("lists supported profiles and Ollama checks in registry order", () => {
     expect(listProfiles().map((profile) => profile.id)).toEqual([
       "openai-chat",
+      "openai-responses",
       "ollama",
       "gemini",
       "anthropic",
@@ -62,6 +63,12 @@ describe("runChecks", () => {
       "openai-chat.tool_calls.basic",
       "openai-chat.tool_calls.stream",
       "openai-chat.error.format",
+    ]);
+    expect(listChecks("openai-responses").map((check) => check.id)).toEqual([
+      "openai-responses.models.list",
+      "openai-responses.responses.basic",
+      "openai-responses.responses.stream",
+      "openai-responses.error.format",
     ]);
     expect(listChecks("openai").map((check) => check.id)).toEqual([
       "openai-chat.models.list",
@@ -291,6 +298,84 @@ describe("runChecks", () => {
       total: 6,
       ok: true,
     });
+  });
+
+  it("runs all OpenAI Responses checks together against successful mocked responses", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse(200, {
+          object: "list",
+          data: [
+            {
+              id: "test-model",
+              object: "model",
+              created: 1,
+              owned_by: "openai",
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse(200, {
+          id: "resp_123",
+          object: "response",
+          model: "test-model",
+          status: "completed",
+          output_text: "pong",
+          usage: {},
+        }),
+      )
+      .mockResolvedValueOnce(
+        sseResponse(
+          200,
+          [
+            'data: {"type":"response.created"}',
+            'data: {"type":"response.output_text.delta","delta":"pong"}',
+            'data: {"type":"response.completed"}',
+          ].join("\n\n"),
+        ),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse(400, {
+          error: {
+            message: "Missing model",
+            type: "invalid_request_error",
+            code: "missing_model",
+            param: "model",
+          },
+        }),
+      );
+    globalThis.fetch = fetchMock;
+
+    const report = await runChecks({
+      profile: "openai-responses",
+      baseUrl: "https://example.test/v1",
+      model: "test-model",
+      apiKey: "secret",
+    });
+
+    expect(report.profile).toBe("openai-responses");
+    expect(report.results.map((result) => [result.id, result.status])).toEqual([
+      ["openai-responses.models.list", "pass"],
+      ["openai-responses.responses.basic", "pass"],
+      ["openai-responses.responses.stream", "pass"],
+      ["openai-responses.error.format", "pass"],
+    ]);
+    expect(report.summary).toMatchObject({
+      passed: 4,
+      total: 4,
+      ok: true,
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://example.test/v1/responses",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          authorization: "Bearer secret",
+        }),
+      }),
+    );
   });
 
   it("runs all Ollama checks together without an API key", async () => {

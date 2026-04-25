@@ -7,6 +7,7 @@ Reusable protocol checks for AI and LLM API endpoints.
 | Profile | API style | Authentication | Streaming | Alias |
 | --- | --- | --- | --- | --- |
 | `openai-chat` | OpenAI-compatible Chat Completions API | Usually requires an API key | SSE | `openai` |
+| `openai-responses` | OpenAI-compatible Responses API | Usually requires an API key | Semantic SSE events | |
 | `ollama` | Ollama local APIs | No API key by default | JSON lines | |
 | `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE | |
 | `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE | |
@@ -21,13 +22,27 @@ The OpenAI-compatible Chat Completions profile currently includes:
 - `openai-chat.error.format`
 
 The canonical profile id is `openai-chat`. The older `openai` profile id remains
-supported as a backward-compatible alias. Future OpenAI Responses API checks
-will use a separate profile and are not included yet.
+supported as a backward-compatible alias. This profile sends Chat
+Completions-style `messages` requests and validates `choices[].message` /
+`choices[].delta` responses.
 
 The OpenAI-compatible tool call checks validate modern Chat Completions `tools`
 / `tool_calls`, including streaming `delta.tool_calls` argument assembly and
 JSON parsing. They are recommended checks; legacy `function_call` is detected
 but does not pass modern tool call compatibility.
+
+The OpenAI-compatible Responses profile currently includes:
+
+- `openai-responses.models.list`
+- `openai-responses.responses.basic`
+- `openai-responses.responses.stream`
+- `openai-responses.error.format`
+
+The canonical profile id is `openai-responses`. It covers `POST /responses`,
+sends Responses-style `input` requests, and validates `output`, `output_text`,
+and semantic streaming events such as `response.output_text.delta`. It does not
+check Responses tools, built-in tools, multimodal input, or conversation state
+in v0.9.
 
 The Ollama profile currently includes:
 
@@ -75,6 +90,15 @@ const report = await runChecks({
   baseUrl: "http://localhost:3000/v1",
   apiKey: "sk-test",
   model: "gpt-4o-mini",
+});
+```
+
+```ts
+const report = await runChecks({
+  profile: "openai-responses",
+  baseUrl: "https://api.openai.com/v1",
+  apiKey: process.env.OPENAI_API_KEY,
+  model: "gpt-5.1-mini",
 });
 ```
 

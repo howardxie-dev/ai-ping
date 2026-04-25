@@ -382,5 +382,11 @@ describe("openai profile order", () => {
 
     expect(listChecks("openai-chat").map((check) => check.id)).toEqual(expected);
     expect(listChecks("openai").map((check) => check.id)).toEqual(expected);
+    expect(listChecks("openai-responses").map((check) => check.id)).toEqual([
+      "openai-responses.models.list",
+      "openai-responses.responses.basic",
+      "openai-responses.responses.stream",
+      "openai-responses.error.format",
+    ]);
   });
 });

@@ -9,14 +9,21 @@ The npm package is `@starroy/ai-ping` and the installed command is `aiping`.
 | Profile | API style | Authentication | Streaming | Alias |
 | --- | --- | --- | --- | --- |
 | `openai-chat` | OpenAI-compatible Chat Completions API | Usually requires an API key | SSE | `openai` |
+| `openai-responses` | OpenAI-compatible Responses API | Usually requires an API key | Semantic SSE events | |
 | `ollama` | Ollama local APIs | No API key by default | JSON lines | |
 | `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE | |
 | `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE | |
 
 The canonical OpenAI-compatible Chat Completions profile is `openai-chat`.
 The older `openai` profile name remains supported as a backward-compatible
-alias. Future OpenAI Responses API checks will use a separate profile and are
-not included yet.
+alias. It sends Chat Completions-style `messages` requests and validates
+`choices[].message` / `choices[].delta` responses.
+
+The OpenAI-compatible Responses profile is `openai-responses`. It sends
+Responses-style `input` requests to `POST /responses` and validates `output`,
+`output_text`, and semantic streaming events such as
+`response.output_text.delta`. It does not check Responses tools, built-in tools,
+multimodal input, or conversation state in v0.9.
 
 ## Usage
 
@@ -42,6 +49,20 @@ including streaming `delta.tool_calls` argument assembly and JSON parsing. They
 are recommended checks, so failures do not fail the overall result while
 required checks pass. Legacy `function_call` is detected but is not treated as
 modern tool call compatibility.
+
+Check OpenAI Responses API:
+
+```bash
+OPENAI_API_KEY=your-key aiping check \
+  --profile openai-responses \
+  --base-url https://api.openai.com/v1 \
+  --model gpt-5.1-mini
+```
+
+Responses checks currently include `openai-responses.models.list`,
+`openai-responses.responses.basic`, `openai-responses.responses.stream`, and
+`openai-responses.error.format`. Responses streaming is semantic SSE events,
+not Chat Completions delta chunks.
 
 Quick demo with the local mock endpoint:
 
@@ -118,6 +139,7 @@ List supported profiles and checks:
 ```bash
 aiping profiles
 aiping checks --profile openai-chat
+aiping checks --profile openai-responses
 ```
 
 Exit codes:
