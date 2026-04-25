@@ -30,6 +30,7 @@ AI Ping 目前包含兩個核心部分：
 | `openai` | OpenAI-compatible API | 通常需要 API key | SSE |
 | `ollama` | Ollama 本機 API | 預設不需要 API key | JSON lines |
 | `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE |
+| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE |
 
 `ollama` profile 覆蓋 Ollama native `/api/tags`、`/api/generate` 和
 `/api/chat`。`/api/generate` 是 prompt-style native API，`/api/chat` 是
@@ -42,6 +43,13 @@ messages-style native API。Ollama OpenAI-compatible `/v1/chat/completions`
 AI Gemini API 與 Gemini OpenAI compatibility 不屬於此 profile。Gemini
 streaming 使用 SSE，但回應 chunk 不是 OpenAI delta 格式。
 
+`anthropic` profile 覆蓋 Anthropic Claude Messages API，base URL 範例為
+`https://api.anthropic.com/v1`。它透過 `--api-key`、`AI_PING_API_KEY` 或
+`ANTHROPIC_API_KEY` 使用 `x-api-key` 認證，並預設傳送
+`anthropic-version: 2023-06-01`。Anthropic streaming 是 event-based SSE，
+不是 OpenAI delta 格式。tool use、extended thinking、computer use、
+Bedrock Anthropic 與 Vertex AI Anthropic 不屬於此 profile。
+
 目前支援的檢查項：
 
 - `models list` 檢查
@@ -50,6 +58,7 @@ streaming 使用 SSE，但回應 chunk 不是 OpenAI delta 格式。
 - 錯誤回應格式檢查
 - Ollama checks：`ollama.tags`、`ollama.generate.basic`、`ollama.generate.stream`、`ollama.chat.basic`、`ollama.chat.stream`
 - Gemini checks：`gemini.models.list`、`gemini.generate.basic`、`gemini.generate.stream`、`gemini.error.format`
+- Anthropic checks：`anthropic.models.list`、`anthropic.messages.basic`、`anthropic.messages.stream`、`anthropic.error.format`
 - 結構化報告，支援 `pass`、`warn`、`fail`、`skip`
 
 npm 套件名稱是 `@starroy/ai-ping`，實際命令名稱是 `aiping`。
@@ -124,6 +133,15 @@ GEMINI_API_KEY=your-key aiping check \
   --model gemini-2.5-flash
 ```
 
+檢查 Anthropic Claude Messages API：
+
+```bash
+ANTHROPIC_API_KEY=your-key aiping check \
+  --profile anthropic \
+  --base-url https://api.anthropic.com/v1 \
+  --model claude-sonnet-4-5
+```
+
 透過參數或環境變數傳入 API key：
 
 ```bash
@@ -134,11 +152,12 @@ AI_PING_API_KEY=sk-test aiping check \
 ```
 
 對於 `openai` profile，也支援 `OPENAI_API_KEY`。對於 `gemini` profile，
-也支援 `GEMINI_API_KEY`。優先順序為：
+也支援 `GEMINI_API_KEY`。對於 `anthropic` profile，也支援
+`ANTHROPIC_API_KEY`。優先順序為：
 
 1. `--api-key`
 2. `AI_PING_API_KEY`
-3. profile 專用環境變數，例如 `OPENAI_API_KEY` 或 `GEMINI_API_KEY`
+3. profile 專用環境變數，例如 `OPENAI_API_KEY`、`GEMINI_API_KEY` 或 `ANTHROPIC_API_KEY`
 
 輸出 JSON 報告，方便附到 issue 或 CI artifact：
 

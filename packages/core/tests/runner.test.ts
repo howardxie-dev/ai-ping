@@ -30,6 +30,7 @@ describe("runChecks", () => {
       "openai",
       "ollama",
       "gemini",
+      "anthropic",
     ]);
     expect(listChecks("ollama").map((check) => check.id)).toEqual([
       "ollama.tags",
@@ -43,6 +44,12 @@ describe("runChecks", () => {
       "gemini.generate.basic",
       "gemini.generate.stream",
       "gemini.error.format",
+    ]);
+    expect(listChecks("anthropic").map((check) => check.id)).toEqual([
+      "anthropic.models.list",
+      "anthropic.messages.basic",
+      "anthropic.messages.stream",
+      "anthropic.error.format",
     ]);
   });
 
@@ -388,6 +395,92 @@ describe("runChecks", () => {
     );
     expect(fetchMock).toHaveBeenCalledWith(
       "https://generativelanguage.googleapis.com/v1beta/models",
+      expect.objectContaining({
+        headers: expect.not.objectContaining({
+          authorization: expect.any(String),
+        }),
+      }),
+    );
+  });
+
+  it("runs all Anthropic checks together with x-api-key and anthropic-version auth", async () => {
+    const messageResponse = {
+      id: "msg_123",
+      type: "message",
+      role: "assistant",
+      model: "claude-sonnet-4-5",
+      content: [{ type: "text", text: "pong" }],
+      stop_reason: "end_turn",
+      usage: { input_tokens: 8, output_tokens: 2 },
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse(200, {
+          data: [
+            {
+              type: "model",
+              id: "claude-sonnet-4-5",
+              display_name: "Claude Sonnet 4.5",
+              created_at: "2026-01-01T00:00:00Z",
+            },
+          ],
+          has_more: false,
+        }),
+      )
+      .mockResolvedValueOnce(jsonResponse(200, messageResponse))
+      .mockResolvedValueOnce(
+        sseResponse(
+          200,
+          [
+            'data: {"type":"message_start","message":{"content":[]}}',
+            'data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"pong"}}',
+            'data: {"type":"message_stop"}',
+          ].join("\n"),
+        ),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse(400, {
+          type: "error",
+          error: {
+            type: "invalid_request_error",
+            message: "model is required",
+          },
+          request_id: "req_123",
+        }),
+      );
+    globalThis.fetch = fetchMock;
+
+    const report = await runChecks({
+      profile: "anthropic",
+      baseUrl: "https://api.anthropic.com/v1",
+      model: "claude-sonnet-4-5",
+      apiKey: "anthropic-key",
+    });
+
+    expect(report.results.map((result) => [result.id, result.status])).toEqual([
+      ["anthropic.models.list", "pass"],
+      ["anthropic.messages.basic", "pass"],
+      ["anthropic.messages.stream", "pass"],
+      ["anthropic.error.format", "pass"],
+    ]);
+    expect(report.summary).toMatchObject({
+      passed: 4,
+      total: 4,
+      ok: true,
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.anthropic.com/v1/models",
+      expect.objectContaining({
+        method: "GET",
+        headers: expect.objectContaining({
+          "x-api-key": "anthropic-key",
+          "anthropic-version": "2023-06-01",
+        }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.anthropic.com/v1/models",
       expect.objectContaining({
         headers: expect.not.objectContaining({
           authorization: expect.any(String),

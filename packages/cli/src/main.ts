@@ -29,7 +29,7 @@ export async function main(argv = process.argv): Promise<void> {
     .action(runChecksCommand);
 
   cli.help();
-  cli.version("0.6.1");
+  cli.version("0.7.0");
   cli.parse(argv, { run: false });
   await cli.runMatchedCommand();
 }

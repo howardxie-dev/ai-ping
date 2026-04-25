@@ -59,6 +59,22 @@ describe("resolveApiKey", () => {
     ).toBeUndefined();
   });
 
+  it("uses ANTHROPIC_API_KEY only for the anthropic profile", () => {
+    expect(
+      resolveApiKey({
+        profile: "anthropic",
+        env: { ANTHROPIC_API_KEY: "anthropic-key" },
+      }),
+    ).toBe("anthropic-key");
+
+    expect(
+      resolveApiKey({
+        profile: "openai",
+        env: { ANTHROPIC_API_KEY: "anthropic-key" },
+      }),
+    ).toBeUndefined();
+  });
+
   it("returns undefined when no matching key is available", () => {
     expect(resolveApiKey({ profile: "openai", env: {} })).toBeUndefined();
   });

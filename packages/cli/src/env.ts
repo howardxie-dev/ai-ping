@@ -15,5 +15,8 @@ export function resolveApiKey(
   if (options.profile === "gemini" && options.env.GEMINI_API_KEY) {
     return options.env.GEMINI_API_KEY;
   }
+  if (options.profile === "anthropic" && options.env.ANTHROPIC_API_KEY) {
+    return options.env.ANTHROPIC_API_KEY;
+  }
   return undefined;
 }

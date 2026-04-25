@@ -9,6 +9,7 @@ Reusable protocol checks for AI and LLM API endpoints.
 | `openai` | OpenAI-compatible APIs | Usually requires an API key | SSE |
 | `ollama` | Ollama local APIs | No API key by default | JSON lines |
 | `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE |
+| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE |
 
 The OpenAI-compatible profile currently includes:
 
@@ -42,6 +43,19 @@ This covers Gemini Developer API REST endpoints under a base URL such as
 authentication and SSE streaming with Gemini response chunks, not OpenAI delta
 chunks.
 
+The Anthropic profile currently includes:
+
+- `anthropic.models.list`
+- `anthropic.messages.basic`
+- `anthropic.messages.stream`
+- `anthropic.error.format`
+
+This covers Anthropic Claude Messages API endpoints under a base URL such as
+`https://api.anthropic.com/v1`. It uses `x-api-key` and
+`anthropic-version: 2023-06-01`. Anthropic streaming is event-based SSE, not
+OpenAI delta streaming. Tool use, extended thinking, Bedrock Anthropic, and
+Vertex AI Anthropic are not covered by this profile.
+
 ```ts
 import { runChecks } from "@starroy/ai-ping-core";
 
@@ -67,6 +81,15 @@ const report = await runChecks({
   baseUrl: "https://generativelanguage.googleapis.com/v1beta",
   apiKey: process.env.GEMINI_API_KEY,
   model: "gemini-2.5-flash",
+});
+```
+
+```ts
+const report = await runChecks({
+  profile: "anthropic",
+  baseUrl: "https://api.anthropic.com/v1",
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  model: "claude-sonnet-4-5",
 });
 ```
 

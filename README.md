@@ -26,6 +26,7 @@ AI Ping currently includes:
 - OpenAI-compatible profile
 - Ollama profile
 - Gemini Developer API profile
+- Anthropic Claude Messages API profile
 - Models list compatibility check
 - Basic non-streaming chat completion check
 - Streaming chat completion check
@@ -43,6 +44,7 @@ The npm package is published as `@starroy/ai-ping`, while the CLI command is
 | `openai` | OpenAI-compatible APIs | Usually requires an API key | SSE |
 | `ollama` | Ollama local APIs | No API key by default | JSON lines |
 | `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE |
+| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE |
 
 The `ollama` profile covers Ollama native `/api/tags`, `/api/generate`, and
 `/api/chat`. `/api/generate` is the prompt-style native API, while `/api/chat`
@@ -56,6 +58,14 @@ such as `https://generativelanguage.googleapis.com/v1beta`. It uses
 separate APIs and are not covered by this profile. Gemini streaming uses SSE,
 but its chunks are Gemini `GenerateContentResponse` objects rather than OpenAI
 delta chunks.
+
+The `anthropic` profile covers Anthropic Claude Messages API endpoints under a
+base URL such as `https://api.anthropic.com/v1`. It uses `x-api-key`
+authentication via `--api-key`, `AI_PING_API_KEY`, or `ANTHROPIC_API_KEY`, and
+sends `anthropic-version: 2023-06-01` by default. Anthropic streaming is
+event-based SSE and is not OpenAI delta streaming. Tool use, extended thinking,
+computer use, Bedrock Anthropic, and Vertex AI Anthropic are not covered by this
+profile.
 
 ## Core Usage
 
@@ -158,6 +168,15 @@ GEMINI_API_KEY=your-key aiping check \
   --model gemini-2.5-flash
 ```
 
+Check Anthropic Claude Messages API:
+
+```bash
+ANTHROPIC_API_KEY=your-key aiping check \
+  --profile anthropic \
+  --base-url https://api.anthropic.com/v1 \
+  --model claude-sonnet-4-5
+```
+
 Use an API key from a flag or environment variable:
 
 ```bash
@@ -168,8 +187,9 @@ AI_PING_API_KEY=sk-test aiping check \
 ```
 
 For the `openai` profile, `OPENAI_API_KEY` is also supported. For the `gemini`
-profile, `GEMINI_API_KEY` is also supported. The flag `--api-key` takes
-precedence over environment variables.
+profile, `GEMINI_API_KEY` is also supported. For the `anthropic` profile,
+`ANTHROPIC_API_KEY` is also supported. The flag `--api-key` takes precedence
+over environment variables.
 
 Output JSON for issue reports or CI artifacts:
 

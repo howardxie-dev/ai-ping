@@ -184,6 +184,46 @@ describe("runCheckCommand", () => {
     } satisfies RunChecksOptions);
   });
 
+  it("runs Anthropic checks with ANTHROPIC_API_KEY", async () => {
+    coreMocks.getProfile.mockReturnValue(
+      makeProfile({
+        id: "anthropic",
+        name: "Anthropic API",
+        description: "Checks common Anthropic Claude Messages API behaviors.",
+      }),
+    );
+    const report = makeReport({
+      profile: "anthropic",
+      endpoint: "https://api.anthropic.com/v1",
+      model: "claude-sonnet-4-5",
+    });
+    const runChecks = vi.fn().mockResolvedValue(report);
+
+    await runCheckCommand(
+      {
+        profile: "anthropic",
+        baseUrl: "https://api.anthropic.com/v1",
+        model: "claude-sonnet-4-5",
+      },
+      {
+        runChecks,
+        env: { ANTHROPIC_API_KEY: "anthropic-key" },
+        writeStdout: vi.fn(),
+        setExitCode: vi.fn(),
+      },
+    );
+
+    expect(runChecks).toHaveBeenCalledWith({
+      profile: "anthropic",
+      baseUrl: "https://api.anthropic.com/v1",
+      model: "claude-sonnet-4-5",
+      apiKey: "anthropic-key",
+      timeoutMs: undefined,
+      only: undefined,
+      skip: undefined,
+    } satisfies RunChecksOptions);
+  });
+
 
   it.each([
     [{ baseUrl: "https://api.example.test/v1", model: "gpt-test" }, "--profile"],
@@ -265,6 +305,12 @@ describe("runProfilesCommand", () => {
         description: "Checks common Gemini Developer API REST behaviors.",
         checks: [],
       }),
+      makeProfile({
+        id: "anthropic",
+        name: "Anthropic API",
+        description: "Checks common Anthropic Claude Messages API behaviors.",
+        checks: [],
+      }),
     ];
     const writeStdout = vi.fn();
     const setExitCode = vi.fn();
@@ -287,6 +333,9 @@ describe("runProfilesCommand", () => {
         "gemini",
         "  Gemini API",
         "  Checks common Gemini Developer API REST behaviors.",
+        "anthropic",
+        "  Anthropic API",
+        "  Checks common Anthropic Claude Messages API behaviors.",
       ].join("\n"),
     );
     expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);
@@ -429,6 +478,58 @@ describe("runChecksCommand", () => {
         "required     gemini.generate.basic  Basic content generation",
         "required     gemini.generate.stream Streaming content generation",
         "recommended  gemini.error.format    Error response format",
+      ].join("\n"),
+    );
+    expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);
+  });
+
+  it("lists Anthropic checks for the selected profile", async () => {
+    const writeStdout = vi.fn();
+    const setExitCode = vi.fn();
+    const getProfile = vi.fn(() =>
+      makeProfile({
+        id: "anthropic",
+        name: "Anthropic API",
+        description: "Checks common Anthropic Claude Messages API behaviors.",
+      }),
+    );
+    const listChecks = vi.fn(() => [
+      makeCheck({
+        id: "anthropic.models.list",
+        severity: "recommended",
+        title: "Models list",
+      }),
+      makeCheck({
+        id: "anthropic.messages.basic",
+        severity: "required",
+        title: "Basic message",
+      }),
+      makeCheck({
+        id: "anthropic.messages.stream",
+        severity: "required",
+        title: "Streaming message",
+      }),
+      makeCheck({
+        id: "anthropic.error.format",
+        severity: "recommended",
+        title: "Error response format",
+      }),
+    ]);
+
+    await runChecksCommand(
+      { profile: "anthropic" },
+      { getProfile, listChecks, writeStdout, setExitCode },
+    );
+
+    expect(getProfile).toHaveBeenCalledWith("anthropic");
+    expect(listChecks).toHaveBeenCalledWith("anthropic");
+    expect(writeStdout).toHaveBeenCalledWith(
+      [
+        "Checks for profile: anthropic",
+        "recommended  anthropic.models.list  Models list",
+        "required     anthropic.messages.basic Basic message",
+        "required     anthropic.messages.stream Streaming message",
+        "recommended  anthropic.error.format Error response format",
       ].join("\n"),
     );
     expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);

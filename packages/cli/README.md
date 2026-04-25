@@ -11,6 +11,7 @@ The npm package is `@starroy/ai-ping` and the installed command is `aiping`.
 | `openai` | OpenAI-compatible APIs | Usually requires an API key | SSE |
 | `ollama` | Ollama local APIs | No API key by default | JSON lines |
 | `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE |
+| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE |
 
 ## Usage
 
@@ -66,6 +67,20 @@ The `gemini` profile uses `x-goog-api-key` and covers Gemini Developer API REST,
 not Vertex AI Gemini API or Gemini OpenAI compatibility. Gemini streaming uses
 SSE, but the response chunks are Gemini `GenerateContentResponse` objects rather
 than OpenAI delta chunks.
+
+Check Anthropic Claude Messages API:
+
+```bash
+ANTHROPIC_API_KEY=your-key aiping check \
+  --profile anthropic \
+  --base-url https://api.anthropic.com/v1 \
+  --model claude-sonnet-4-5
+```
+
+The `anthropic` profile uses `x-api-key` and sends
+`anthropic-version: 2023-06-01`. It covers the Claude Messages API, not tool
+use, extended thinking, Bedrock Anthropic, or Vertex AI Anthropic. Anthropic
+streaming is event-based SSE rather than OpenAI delta chunks.
 
 Use JSON output for issue reports or CI artifacts:
 

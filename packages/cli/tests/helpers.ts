@@ -41,7 +41,7 @@ export function makeReport(
 
   return {
     tool: "ai-ping",
-    version: "0.6.1",
+    version: "0.7.0",
     profile: "openai",
     endpoint: "https://api.example.test/v1",
     model: "gpt-test",

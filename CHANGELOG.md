@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.7.0
+
+### Added
+
+- Added the `anthropic` profile for Anthropic Claude Messages API checks.
+- Added Anthropic models list, basic message, streaming message, and error
+  format checks.
+- Added `ANTHROPIC_API_KEY` support in the CLI.
+
+### Changed
+
+- Documented Anthropic `/v1` base URL usage, `x-api-key` authentication, and
+  the default `anthropic-version: 2023-06-01` header.
+- Clarified that Anthropic streaming uses event-based SSE, not OpenAI delta
+  chunks.
+
 ## 0.6.1
 
 ### Changed
