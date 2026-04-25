@@ -1,6 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { main } from "../src/main";
 
+vi.mock("@starroy/ai-ping-core", () => ({
+  getProfile: vi.fn(),
+  listChecks: vi.fn(),
+  listProfiles: vi.fn(),
+  runChecks: vi.fn(),
+}));
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
