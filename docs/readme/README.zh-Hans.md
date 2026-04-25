@@ -4,7 +4,7 @@
 [![npm version](https://img.shields.io/npm/v/@starroy/ai-ping.svg)](https://www.npmjs.com/package/@starroy/ai-ping)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](../../LICENSE)
 
-AI / LLM API endpoint 的轻量协议检查工具。
+用于检查常见 LLM API 协议兼容性的稳定 CLI 和 Core 库。
 
 > Ping AI APIs before your clients do.
 
@@ -13,203 +13,79 @@ AI / LLM API endpoint 的轻量协议检查工具。
 - [English](../../README.md)
 - [繁體中文](README.zh-Hant.md)
 
-AI Ping 不是网络 ping 工具，不是 benchmark，也不是官方兼容性认证。它用于快速检查一个 AI / LLM API endpoint 是否暴露了常见客户端可以消费的协议行为。
+AI Ping 是协议检查工具，不是网络 ping、benchmark、load test、uptime
+monitor、API proxy、聊天客户端或官方认证。它用于确认一个 AI / LLM API
+endpoint 是否具备客户端预期的协议行为。
 
-## 当前范围
-
-AI Ping 目前包含两个核心部分：
-
-- `@starroy/ai-ping-core`：可复用的协议检查核心库
-- `@starroy/ai-ping` CLI：命令行工具，提供 `aiping` 命令
-- `openai-chat.models.list`：`/models` 最低兼容结构检查
-- `openai-responses`：OpenAI-compatible Responses API 检查
-
-当前支持的 profile：
-
-| Profile | API 形态 | 认证 | Streaming | Alias |
-| --- | --- | --- | --- | --- |
-| `openai-chat` | OpenAI-compatible Chat Completions API | 通常需要 API key | SSE | `openai` |
-| `openai-responses` | OpenAI-compatible Responses API | 通常需要 API key | semantic SSE events | |
-| `ollama` | Ollama 本地 API | 默认不需要 API key | JSON lines | |
-| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE | |
-| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE | |
-
-`ollama` profile 覆盖 Ollama native `/api/tags`、`/api/generate` 和
-`/api/chat`。`/api/generate` 是 prompt-style native API，`/api/chat` 是
-messages-style native API。Ollama OpenAI-compatible `/v1/chat/completions`
-应使用 `openai-chat` profile 检查。
-
-`gemini` profile 覆盖 Gemini Developer API REST，base URL 示例为
-`https://generativelanguage.googleapis.com/v1beta`。它通过 `--api-key`、
-`AI_PING_API_KEY` 或 `GEMINI_API_KEY` 使用 `x-goog-api-key` 认证。Vertex
-AI Gemini API 与 Gemini OpenAI compatibility 不属于此 profile。Gemini
-streaming 使用 SSE，但响应 chunk 不是 OpenAI delta 格式。
-
-`anthropic` profile 覆盖 Anthropic Claude Messages API，base URL 示例为
-`https://api.anthropic.com/v1`。它通过 `--api-key`、`AI_PING_API_KEY` 或
-`ANTHROPIC_API_KEY` 使用 `x-api-key` 认证，并默认发送
-`anthropic-version: 2023-06-01`。Anthropic streaming 是 event-based SSE，
-不是 OpenAI delta 格式。tool use、extended thinking、computer use、
-Bedrock Anthropic 与 Vertex AI Anthropic 不属于此 profile。
-
-当前支持的检查项：
-
-- `models list` 检查
-- 基础非流式 chat completion 检查
-- 流式 chat completion 检查
-- 基础非流式 Responses API 检查
-- 流式 Responses API 检查
-- OpenAI-compatible modern tool calls 检查
-- 错误响应格式检查
-- Ollama checks：`ollama.tags`、`ollama.generate.basic`、`ollama.generate.stream`、`ollama.chat.basic`、`ollama.chat.stream`
-- Gemini checks：`gemini.models.list`、`gemini.generate.basic`、`gemini.generate.stream`、`gemini.error.format`
-- Anthropic checks：`anthropic.models.list`、`anthropic.messages.basic`、`anthropic.messages.stream`、`anthropic.error.format`
-- 结构化报告，支持 `pass`、`warn`、`fail`、`skip`
-
-`openai-chat` 是 OpenAI-compatible Chat Completions 的规范 profile 名称。
-旧的 `openai` 名称仍作为向后兼容 alias 可用。它发送 Chat
-Completions 风格的 `messages` 请求，并检查 `choices[].message` /
-`choices[].delta` 响应。
-
-`openai-responses` profile 覆盖 OpenAI-compatible Responses API 的
-`POST /responses`。它发送 Responses 风格的 `input` 请求，并检查
-Responses 风格的 `output`、`output_text` 和 `response.output_text.delta`
-等 semantic streaming events。v0.9 不检查 Responses tools、built-in
-tools、multimodal input 或 conversation state。
-
-`openai-chat` profile 包含 modern Chat Completions `tools` / `tool_calls` 的
-recommended checks。它会检查非流式 `choices[].message.tool_calls`，也会检查
-流式 `choices[].delta.tool_calls` 的 arguments 拼接与 JSON parse。legacy
-`function_call` 会被检测出来，但不会被当作 modern `tool_calls` 通过。
-
-npm 包名是 `@starroy/ai-ping`，实际命令名是 `aiping`。
-
-## CLI 使用
-
-安装发布后的 CLI：
+## 安装
 
 ```bash
 npm install -g @starroy/ai-ping
 ```
 
-本地开发运行：
+CLI 包名是 `@starroy/ai-ping`，命令名是 `aiping`。可复用 Core 库包名是
+`@starroy/ai-ping-core`。
+
+## 快速开始
 
 ```bash
-pnpm install
-pnpm build
-pnpm --filter @starroy/ai-ping cli --help
-```
-
-## 快速体验
-
-先启动 mock OpenAI-compatible endpoint：
-
-```bash
-pnpm install
-pnpm --filter openai-compatible-mock dev
-```
-
-再在另一个终端运行：
-
-```bash
-npm install -g @starroy/ai-ping
+aiping profiles
 
 aiping check \
   --profile openai-chat \
-  --base-url http://localhost:3000/v1 \
-  --model demo-model
-```
-
-AI Ping 检查的是协议行为，不是简单的网络连通性。
-
-运行协议检查：
-
-```bash
-aiping check \
-  --profile openai-chat \
-  --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini
-```
-
-只检查 OpenAI-compatible modern tool calls：
-
-```bash
-aiping check \
-  --profile openai-chat \
-  --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
-  --only openai-chat.tool_calls.basic,openai-chat.tool_calls.stream
-```
-
-tool call checks 是 `recommended`，用于诊断 agent / client 兼容性。只要
-required checks 通过，它们失败也不会让整体结果变成非 OK。
-
-检查 OpenAI Responses API：
-
-```bash
-OPENAI_API_KEY=your-key aiping check \
-  --profile openai-responses \
   --base-url https://api.openai.com/v1 \
   --model gpt-5.1-mini
 ```
 
-Responses checks 目前包含 `openai-responses.models.list`、
-`openai-responses.responses.basic`、`openai-responses.responses.stream` 和
-`openai-responses.error.format`。这个 profile 使用 `input`，不是
-`messages`；Responses streaming 是 semantic SSE events，不是 Chat
-Completions delta chunks。
-
-检查本地 Ollama endpoint：
+API key 可通过 `--api-key`、`AI_PING_API_KEY` 或 profile 专用环境变量传入。
 
 ```bash
-aiping check \
-  --profile ollama \
-  --base-url http://localhost:11434 \
-  --model llama3.2
-```
-
-Ollama 不需要 API key。它的 streaming 响应使用 JSON lines，不是 SSE。
-
-Ollama OpenAI-compatible `/v1/chat/completions` 不属于 `ollama` native
-profile 覆盖范围，请使用 `openai-chat` profile 检查。
-
-检查 Gemini Developer API：
-
-```bash
-GEMINI_API_KEY=your-key aiping check \
-  --profile gemini \
-  --base-url https://generativelanguage.googleapis.com/v1beta \
-  --model gemini-2.5-flash
-```
-
-检查 Anthropic Claude Messages API：
-
-```bash
-ANTHROPIC_API_KEY=your-key aiping check \
-  --profile anthropic \
-  --base-url https://api.anthropic.com/v1 \
-  --model claude-sonnet-4-5
-```
-
-通过参数或环境变量传入 API key：
-
-```bash
-AI_PING_API_KEY=sk-test aiping check \
+OPENAI_API_KEY=your-key aiping check \
   --profile openai-chat \
-  --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini
+  --base-url https://api.openai.com/v1 \
+  --model gpt-5.1-mini
 ```
 
-对于 `openai-chat` 和 `openai-responses` profile，也支持
-`OPENAI_API_KEY`。旧的 `openai` alias 保留与 `openai-chat` 相同的环境变量
-行为。对于 `gemini` profile，也支持 `GEMINI_API_KEY`。对于 `anthropic`
-profile，也支持 `ANTHROPIC_API_KEY`。优先级为：
+## 支持的 Profiles
 
-1. `--api-key`
-2. `AI_PING_API_KEY`
-3. profile 专用环境变量，例如 `OPENAI_API_KEY`、`GEMINI_API_KEY` 或 `ANTHROPIC_API_KEY`
+| Profile | 说明 | Alias | API key 环境变量 |
+| --- | --- | --- | --- |
+| `openai-chat` | OpenAI-compatible Chat Completions API | `openai` | `OPENAI_API_KEY` |
+| `openai-responses` | OpenAI-compatible Responses API | - | `OPENAI_API_KEY` |
+| `ollama` | Ollama native API | - | 通常不需要 |
+| `gemini` | Gemini Developer API REST | - | `GEMINI_API_KEY` |
+| `anthropic` | Anthropic Claude Messages API | - | `ANTHROPIC_API_KEY` |
 
-输出 JSON 报告，便于附到 issue 或 CI artifact：
+`openai` alias 指向 `openai-chat`，并会在 AI Ping 1.x 中继续保留。
+
+## 应该使用哪个 Profile？
+
+Chat Completions 兼容 endpoint 使用 `openai-chat`，包括本地 proxy、gateway
+以及 Ollama 的 OpenAI-compatible `/v1/chat/completions`。
+
+实现 OpenAI-compatible `POST /responses` 的 endpoint 使用
+`openai-responses`。它检查 Responses 风格的 `input`、`output`、
+`output_text` 和 semantic streaming events。v1.0 不检查 Responses tools、
+built-in tools、multimodal input 或 conversation state。
+
+Ollama native `/api/tags`、`/api/generate` 和 `/api/chat` 使用 `ollama`。
+Ollama native streaming 是 JSON lines，不是 SSE。
+
+Gemini Developer API REST 使用 `gemini`，base URL 示例为
+`https://generativelanguage.googleapis.com/v1beta`。Vertex AI Gemini 与 Gemini
+OpenAI compatibility 是不同 API。
+
+Anthropic Claude Messages API 使用 `anthropic`，base URL 示例为
+`https://api.anthropic.com/v1`。Bedrock Anthropic、Vertex AI Anthropic、tool
+use、extended thinking 和 computer use 不属于 v1.0 profile 范围。
+
+## 报告
+
+AI Ping 支持三种报告形态：
+
+- Console report：默认终端输出，适合人工阅读
+- JSON report：结构化输出，适合 issue、自动化和 CI
+- HTML report：静态报告文件，适合分享、截图和 CI artifact
 
 ```bash
 aiping check \
@@ -218,8 +94,6 @@ aiping check \
   --model gpt-4o-mini \
   --json
 ```
-
-写入静态 HTML 报告，便于分享、截图或作为 CI artifact 上传：
 
 ```bash
 aiping check \
@@ -231,15 +105,46 @@ aiping check \
 
 `--html` 可以和 `--json` 一起使用；stdout 仍然只输出纯 JSON，HTML 文件会单独写入。
 
-列出可用 profiles 和 checks：
+报告默认不包含请求头或完整 API key。分享前仍应检查 JSON / HTML 报告，因为
+endpoint 名称、model 名称、base URL hostname、错误 body 或 provider message
+可能包含私有信息。
+
+详见 [Reports](../reports.md)。
+
+## OK 是什么意思？
+
+当检查完成并且没有 required check 失败时，`summary.ok` 为 true。Recommended
+check 可以失败，只要 required checks 通过，整体结果仍然是 OK。
+
+Required checks 覆盖大多数客户端成功调用 endpoint 所需的协议行为。Recommended
+checks 用于诊断有用的兼容性细节，例如 OpenAI-compatible `tools` /
+`tool_calls`，但不会在 required checks 通过时让整体运行失败。
+
+## CLI 命令
 
 ```bash
+aiping --help
+aiping check --help
 aiping profiles
 aiping checks --profile openai-chat
-aiping checks --profile openai-responses
 ```
 
-只运行部分 checks：
+以下 `aiping check` 参数在 1.x 中保持稳定：
+
+```text
+--profile
+--base-url
+--model
+--api-key
+--timeout
+--json
+--html
+--only
+--skip
+--verbose
+```
+
+可用逗号分隔的 check ID 限定或跳过检查：
 
 ```bash
 aiping check \
@@ -249,24 +154,58 @@ aiping check \
   --only openai-chat.chat.basic,openai-chat.chat.stream
 ```
 
-跳过部分 checks：
-
-```bash
-aiping check \
-  --profile openai-chat \
-  --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
-  --skip openai-chat.error.format
-```
-
 ## Exit Codes
 
-- `0`：检查完成，required checks 通过
-- `1`：检查完成，但至少一个 required check 失败
-- `2`：参数或配置错误
-- `3`：CLI 未预期运行时错误
+| Exit code | 含义 |
+| ---: | --- |
+| `0` | 检查完成，required checks 通过 |
+| `1` | 检查完成，但至少一个 required check 失败 |
+| `2` | CLI 参数或配置错误 |
+| `3` | 未预期运行时错误 |
 
-只有 `summary.ok === false` 时才返回 `1`。如果只是 recommended check 失败，但 required checks 通过，CLI 仍返回 `0`。
+## 兼容性承诺
+
+AI Ping 1.x 目标是保持 CLI 命令、稳定参数、Core report 核心字段、profile
+名称、`openai` alias、npm 包名和 exit code 语义向后兼容。
+
+稳定 report 字段包括 `version`、`profile`、`endpoint`、`model`、
+`startedAt`、`durationMs`、`summary` 和 `results`。Minor 版本可以向后兼容地
+新增 profile、check、输出选项或 optional report 字段，但不会删除或重命名稳定字段。
+
+详见 [Compatibility Policy](../compatibility.md)。
+
+## CI 示例
+
+```yaml
+name: AI Ping
+on:
+  pull_request:
+jobs:
+  ai-ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install -g @starroy/ai-ping
+      - run: |
+          mkdir -p reports
+          aiping check \
+            --profile openai-chat \
+            --base-url http://localhost:3000/v1 \
+            --model test-model \
+            --html reports/aiping.html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ai-ping-report
+          path: reports/aiping.html
+```
+
+## 故障排查
+
+大多数失败来自四类问题：profile 选错、base URL 前缀不对、API key 缺失或用错
+header、provider 只实现了目标协议的一部分。
+
+提交 issue 前请先阅读 [Troubleshooting](../troubleshooting.md)。
 
 ## Core 使用
 
@@ -286,31 +225,6 @@ console.log(report.results);
 
 `runChecks` 只返回结构化报告，不打印终端输出、不写文件、不设置 exit code，也不管理 UI 状态。
 
-## CI 示例
-
-```yaml
-name: AI Ping
-on:
-  pull_request:
-jobs:
-  ai-ping:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: npm install -g @starroy/ai-ping
-      - run: |
-          aiping check \
-            --profile openai-chat \
-            --base-url http://localhost:3000/v1 \
-            --model test-model \
-            --html reports/aiping.html
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ai-ping-report
-          path: reports/aiping.html
-```
-
 ## 开发
 
 ```bash
@@ -322,21 +236,7 @@ pnpm build
 
 贡献指南见 [CONTRIBUTING.md](../../CONTRIBUTING.md)。
 
-## 隐私与安全
+## 安全
 
-AI Ping 默认不保存 API key、请求头或完整响应内容。报告中不会额外加入完整 API key 或 Authorization header。
-
-请不要在公开 issue 中提交 API key、token、私有 endpoint 细节或敏感 JSON 报告。详见 [SECURITY.md](../../SECURITY.md)。
-
-## 非目标
-
-AI Ping 不做：
-
-- benchmark
-- load test
-- uptime monitoring
-- 聊天客户端
-- API proxy
-- 协议转换
-- 官方认证
-- 云端托管服务
+请不要在公开 issue 中提交 API key、Authorization header、私有 endpoint
+secret、私有 base URL 或敏感 JSON / HTML 报告。详见 [SECURITY.md](../../SECURITY.md)。

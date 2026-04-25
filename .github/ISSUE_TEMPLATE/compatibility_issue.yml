@@ -1,26 +1,44 @@
 name: Compatibility issue
-description: Report an AI API compatibility issue
+description: Report an AI API protocol compatibility issue
 title: "compat: "
 labels: ["compatibility"]
 body:
   - type: markdown
     attributes:
       value: |
-        Please remove secrets before posting any command, logs, or JSON report.
+        Use this template when an endpoint behaves differently from the selected AI Ping profile.
+
+        Do not paste API keys, Authorization headers, private endpoint secrets, private base URLs, or sensitive customer data. Please sanitize commands, logs, JSON reports, and HTML reports before sharing.
+
+        Please include at least one report when possible:
+
+        ```bash
+        aiping check ... --json > aiping-report.json
+        aiping check ... --html aiping-report.html
+        ```
+
+  - type: input
+    id: version
+    attributes:
+      label: AI Ping version
+      placeholder: "1.0.0"
+    validations:
+      required: true
 
   - type: input
     id: profile
     attributes:
       label: Profile
-      placeholder: "openai"
+      placeholder: "openai-chat / openai-responses / ollama / gemini / anthropic"
     validations:
       required: true
 
   - type: input
     id: endpoint_type
     attributes:
-      label: Endpoint type
-      placeholder: "local proxy / gateway / provider / self-hosted"
+      label: Base URL type
+      description: Describe the endpoint type without exposing a private URL if it is sensitive.
+      placeholder: "public provider / private gateway / local proxy / self-hosted / local Ollama"
     validations:
       required: true
 
@@ -28,33 +46,16 @@ body:
     id: model
     attributes:
       label: Model
-      placeholder: "gpt-4o-mini"
-    validations:
-      required: true
-
-  - type: input
-    id: client_sdk
-    attributes:
-      label: Client or SDK
-      placeholder: "openai-node / LiteLLM / custom client"
+      placeholder: "gpt-5.1-mini / llama3.2 / gemini-2.5-flash / claude-sonnet-4-5"
     validations:
       required: true
 
   - type: textarea
     id: command
     attributes:
-      label: Command
+      label: Command used
+      description: Paste the command you ran. Remove API keys, Authorization headers, and private endpoint secrets.
       render: bash
-      description: Paste the command you ran. Remove API keys before posting.
-    validations:
-      required: true
-
-  - type: textarea
-    id: report
-    attributes:
-      label: Sanitized JSON report
-      description: Run `aiping check --profile openai --base-url <your-endpoint> --model <your-model> --json` and paste the sanitized output. Please remove secrets before posting the report.
-      render: json
     validations:
       required: true
 
@@ -62,6 +63,7 @@ body:
     id: expected
     attributes:
       label: Expected compatibility behavior
+      description: What did you expect the endpoint to support?
     validations:
       required: true
 
@@ -69,5 +71,38 @@ body:
     id: actual
     attributes:
       label: Actual behavior
+      description: What failed or differed from the expected protocol?
     validations:
       required: true
+
+  - type: textarea
+    id: console_output
+    attributes:
+      label: Console output
+      description: Paste relevant output with secrets removed.
+      render: text
+
+  - type: textarea
+    id: json_report
+    attributes:
+      label: Sanitized JSON report
+      description: Paste or attach output from `aiping check ... --json > aiping-report.json` after removing secrets and private details.
+      render: json
+
+  - type: textarea
+    id: html_report
+    attributes:
+      label: Sanitized HTML report
+      description: Attach or link a sanitized report from `aiping check ... --html aiping-report.html` if available. Do not paste secrets or private endpoint details.
+
+  - type: input
+    id: client_sdk
+    attributes:
+      label: Client or SDK affected
+      placeholder: "openai-node / LiteLLM / custom client / not sure"
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Include provider documentation links or sanitized examples if useful.

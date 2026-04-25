@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.0
+
+### Stable
+
+- AI Ping reaches the first stable Core / CLI release.
+- Stabilized profile naming for `openai-chat`, `openai-responses`, `ollama`,
+  `gemini`, and `anthropic`.
+- Stabilized the `openai` alias for `openai-chat` in the 1.x line.
+- Stabilized report output formats: console, JSON, and HTML.
+- Stabilized CLI commands, stable check options, and exit code semantics.
+- Clarified the 1.x compatibility promise for CLI behavior, report core fields,
+  profile names, aliases, package names, and SemVer.
+
+### Documentation
+
+- Reworked the README files around v1.0 stable positioning, quick start,
+  supported profiles, profile selection, reports, exit codes, CI usage, and
+  troubleshooting.
+- Added compatibility policy documentation.
+- Added troubleshooting documentation.
+- Added report format and safe sharing documentation.
+- Updated issue templates to request sanitized JSON / HTML reports and warn
+  against posting API keys, Authorization headers, private endpoint secrets, or
+  private base URLs.
+- Updated the release checklist for v1.0 validation, report smoke tests, npm
+  dry-runs, publishing, tagging, GitHub release, and post-publish smoke checks.
+
 ## 0.10.0
 
 ### Added

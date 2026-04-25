@@ -1,8 +1,20 @@
 name: Feature request
-description: Suggest a new feature or check
+description: Suggest a new profile, check, output option, or documentation improvement
 title: "feat: "
 labels: ["enhancement"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not paste API keys, Authorization headers, private endpoint secrets, private base URLs, or sensitive customer data. If your request is based on a real endpoint, attach only sanitized JSON or HTML reports.
+
+        Helpful report commands:
+
+        ```bash
+        aiping check ... --json > aiping-report.json
+        aiping check ... --html aiping-report.html
+        ```
+
   - type: textarea
     id: use_case
     attributes:
@@ -12,23 +24,36 @@ body:
       required: true
 
   - type: input
-    id: profile
+    id: target_profile
     attributes:
       label: Target profile
-      placeholder: "openai / anthropic / gemini / ollama"
+      placeholder: "openai-chat / openai-responses / ollama / gemini / anthropic / new profile"
+
+  - type: input
+    id: endpoint_type
+    attributes:
+      label: Base URL type
+      description: Describe the endpoint type without exposing a private URL if it is sensitive.
+      placeholder: "public provider / private gateway / local proxy / self-hosted"
 
   - type: textarea
     id: proposal
     attributes:
-      label: Proposed check
-      description: Describe the check or behavior you want.
+      label: Proposal
+      description: Describe the profile, check, output option, or documentation change you want.
     validations:
       required: true
 
   - type: textarea
+    id: report
+    attributes:
+      label: Sanitized JSON or HTML report
+      description: Attach or paste a sanitized report if it helps explain the request. Do not include secrets or private endpoint details.
+
+  - type: textarea
     id: insufficiency
     attributes:
-      label: Why existing checks are insufficient
+      label: Why existing behavior is insufficient
     validations:
       required: true
 
