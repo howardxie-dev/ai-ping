@@ -2,6 +2,8 @@ import { openaiChatBasicCheck } from "./checks/chat-basic";
 import { openaiChatStreamCheck } from "./checks/chat-stream";
 import { openaiErrorFormatCheck } from "./checks/error-format";
 import { openaiModelsListCheck } from "./checks/models-list";
+import { openaiToolCallsBasicCheck } from "./checks/tool-calls-basic";
+import { openaiToolCallsStreamCheck } from "./checks/tool-calls-stream";
 import type { ProtocolProfile } from "../../types";
 
 export const openaiProfile: ProtocolProfile = {
@@ -12,6 +14,8 @@ export const openaiProfile: ProtocolProfile = {
     openaiModelsListCheck,
     openaiChatBasicCheck,
     openaiChatStreamCheck,
+    openaiToolCallsBasicCheck,
+    openaiToolCallsStreamCheck,
     openaiErrorFormatCheck,
   ],
 };

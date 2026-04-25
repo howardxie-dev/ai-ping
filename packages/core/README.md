@@ -16,7 +16,14 @@ The OpenAI-compatible profile currently includes:
 - `openai.models.list`
 - `openai.chat.basic`
 - `openai.chat.stream`
+- `openai.tool_calls.basic`
+- `openai.tool_calls.stream`
 - `openai.error.format`
+
+The OpenAI-compatible tool call checks validate modern Chat Completions
+`tools` / `tool_calls`, including streaming `delta.tool_calls` argument
+assembly and JSON parsing. They are recommended checks; legacy `function_call`
+is detected but does not pass modern tool call compatibility.
 
 The Ollama profile currently includes:
 

@@ -51,6 +51,14 @@ describe("runChecks", () => {
       "anthropic.messages.stream",
       "anthropic.error.format",
     ]);
+    expect(listChecks("openai").map((check) => check.id)).toEqual([
+      "openai.models.list",
+      "openai.chat.basic",
+      "openai.chat.stream",
+      "openai.tool_calls.basic",
+      "openai.tool_calls.stream",
+      "openai.error.format",
+    ]);
   });
 
   it("validates required options and known profiles", async () => {
@@ -138,7 +146,11 @@ describe("runChecks", () => {
       profile: "openai",
       baseUrl: "https://example.test/v1",
       model: "test-model",
-      skip: ["openai.chat.stream"],
+      skip: [
+        "openai.chat.stream",
+        "openai.tool_calls.basic",
+        "openai.tool_calls.stream",
+      ],
     });
 
     expect(report.results.map((result) => result.id)).toEqual([
@@ -202,6 +214,41 @@ describe("runChecks", () => {
         ),
       )
       .mockResolvedValueOnce(
+        jsonResponse(200, {
+          id: "chatcmpl-2",
+          created: 1,
+          model: "test-model",
+          usage: {},
+          choices: [
+            {
+              message: {
+                tool_calls: [
+                  {
+                    id: "call_123",
+                    type: "function",
+                    function: {
+                      name: "get_weather",
+                      arguments: '{"location":"Tokyo"}',
+                    },
+                  },
+                ],
+              },
+              finish_reason: "tool_calls",
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(
+        sseResponse(
+          200,
+          [
+            'data: {"choices":[{"delta":{"tool_calls":[{"index":0,"id":"call_123","type":"function","function":{"name":"get_weather","arguments":"{\\"location\\""}}]}}]}',
+            'data: {"choices":[{"delta":{"tool_calls":[{"index":0,"function":{"arguments":":\\"Tokyo\\"}"}}]},"finish_reason":"tool_calls"}]}',
+            "data: [DONE]",
+          ].join("\n\n"),
+        ),
+      )
+      .mockResolvedValueOnce(
         jsonResponse(400, {
           error: {
             message: "Missing model",
@@ -223,11 +270,13 @@ describe("runChecks", () => {
       ["openai.models.list", "pass"],
       ["openai.chat.basic", "pass"],
       ["openai.chat.stream", "pass"],
+      ["openai.tool_calls.basic", "pass"],
+      ["openai.tool_calls.stream", "pass"],
       ["openai.error.format", "pass"],
     ]);
     expect(report.summary).toMatchObject({
-      passed: 4,
-      total: 4,
+      passed: 6,
+      total: 6,
       ok: true,
     });
   });

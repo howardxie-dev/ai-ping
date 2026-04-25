@@ -375,6 +375,8 @@ describe("openai profile order", () => {
       "openai.models.list",
       "openai.chat.basic",
       "openai.chat.stream",
+      "openai.tool_calls.basic",
+      "openai.tool_calls.stream",
       "openai.error.format",
     ]);
   });

@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.8.0
+
+### Added
+
+- Added `openai.tool_calls.basic` for modern Chat Completions `tool_calls`.
+- Added `openai.tool_calls.stream` for streaming `delta.tool_calls`.
+- Added streaming tool call aggregation and arguments JSON parsing.
+- Added legacy `function_call` detection without treating it as modern
+  `tool_calls` compatibility.
+
+### Changed
+
+- Documented OpenAI-compatible tool call checks and their recommended severity.
+
 ## 0.7.0
 
 ### Added

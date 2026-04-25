@@ -30,6 +30,7 @@ AI Ping currently includes:
 - Models list compatibility check
 - Basic non-streaming chat completion check
 - Streaming chat completion check
+- Modern OpenAI-compatible tool call checks
 - Error response format check
 - Structured report with `pass`, `warn`, `fail`, and `skip`
 - JSON output and CI-friendly exit codes
@@ -66,6 +67,12 @@ sends `anthropic-version: 2023-06-01` by default. Anthropic streaming is
 event-based SSE and is not OpenAI delta streaming. Tool use, extended thinking,
 computer use, Bedrock Anthropic, and Vertex AI Anthropic are not covered by this
 profile.
+
+The `openai` profile includes recommended checks for modern Chat Completions
+`tools` / `tool_calls`. These checks verify both non-streaming
+`choices[].message.tool_calls` and streaming `choices[].delta.tool_calls`
+argument assembly. Legacy `function_call` responses are detected but are not
+treated as passing modern tool call checks.
 
 ## Core Usage
 
@@ -143,6 +150,20 @@ aiping check \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini
 ```
+
+Check modern OpenAI-compatible tool calls only:
+
+```bash
+aiping check \
+  --profile openai \
+  --base-url http://localhost:3000/v1 \
+  --model gpt-4o-mini \
+  --only openai.tool_calls.basic,openai.tool_calls.stream
+```
+
+Tool call checks are `recommended`: failures help diagnose agent and client
+compatibility, but they do not fail the overall result while required checks
+pass.
 
 Check a local Ollama endpoint:
 

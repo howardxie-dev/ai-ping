@@ -55,11 +55,17 @@ Bedrock Anthropic 与 Vertex AI Anthropic 不属于此 profile。
 - `models list` 检查
 - 基础非流式 chat completion 检查
 - 流式 chat completion 检查
+- OpenAI-compatible modern tool calls 检查
 - 错误响应格式检查
 - Ollama checks：`ollama.tags`、`ollama.generate.basic`、`ollama.generate.stream`、`ollama.chat.basic`、`ollama.chat.stream`
 - Gemini checks：`gemini.models.list`、`gemini.generate.basic`、`gemini.generate.stream`、`gemini.error.format`
 - Anthropic checks：`anthropic.models.list`、`anthropic.messages.basic`、`anthropic.messages.stream`、`anthropic.error.format`
 - 结构化报告，支持 `pass`、`warn`、`fail`、`skip`
+
+`openai` profile 包含 modern Chat Completions `tools` / `tool_calls` 的
+recommended checks。它会检查非流式 `choices[].message.tool_calls`，也会检查
+流式 `choices[].delta.tool_calls` 的 arguments 拼接与 JSON parse。legacy
+`function_call` 会被检测出来，但不会被当作 modern `tool_calls` 通过。
 
 npm 包名是 `@starroy/ai-ping`，实际命令名是 `aiping`。
 
@@ -109,6 +115,19 @@ aiping check \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini
 ```
+
+只检查 OpenAI-compatible modern tool calls：
+
+```bash
+aiping check \
+  --profile openai \
+  --base-url http://localhost:3000/v1 \
+  --model gpt-4o-mini \
+  --only openai.tool_calls.basic,openai.tool_calls.stream
+```
+
+tool call checks 是 `recommended`，用于诊断 agent / client 兼容性。只要
+required checks 通过，它们失败也不会让整体结果变成非 OK。
 
 检查本地 Ollama endpoint：
 

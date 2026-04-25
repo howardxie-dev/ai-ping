@@ -373,6 +373,62 @@ describe("runChecksCommand", () => {
     expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);
   });
 
+  it("lists OpenAI tool call checks for the selected profile", async () => {
+    const writeStdout = vi.fn();
+    const setExitCode = vi.fn();
+    const getProfile = vi.fn(() => makeProfile());
+    const listChecks = vi.fn(() => [
+      makeCheck({
+        id: "openai.models.list",
+        severity: "recommended",
+        title: "Models list",
+      }),
+      makeCheck({
+        id: "openai.chat.basic",
+        severity: "required",
+        title: "Basic chat completion",
+      }),
+      makeCheck({
+        id: "openai.chat.stream",
+        severity: "required",
+        title: "Streaming chat completion",
+      }),
+      makeCheck({
+        id: "openai.tool_calls.basic",
+        severity: "recommended",
+        title: "Basic tool calls",
+      }),
+      makeCheck({
+        id: "openai.tool_calls.stream",
+        severity: "recommended",
+        title: "Streaming tool calls",
+      }),
+      makeCheck({
+        id: "openai.error.format",
+        severity: "recommended",
+        title: "Error response format",
+      }),
+    ]);
+
+    await runChecksCommand(
+      { profile: "openai" },
+      { getProfile, listChecks, writeStdout, setExitCode },
+    );
+
+    expect(writeStdout).toHaveBeenCalledWith(
+      [
+        "Checks for profile: openai",
+        "recommended  openai.models.list     Models list",
+        "required     openai.chat.basic      Basic chat completion",
+        "required     openai.chat.stream     Streaming chat completion",
+        "recommended  openai.tool_calls.basic Basic tool calls",
+        "recommended  openai.tool_calls.stream Streaming tool calls",
+        "recommended  openai.error.format    Error response format",
+      ].join("\n"),
+    );
+    expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);
+  });
+
   it("lists Ollama checks for the selected profile", async () => {
     const writeStdout = vi.fn();
     const setExitCode = vi.fn();

@@ -22,6 +22,22 @@ aiping check \
   --model gpt-4o-mini
 ```
 
+Check modern OpenAI-compatible tool calls only:
+
+```bash
+aiping check \
+  --profile openai \
+  --base-url http://localhost:3000/v1 \
+  --model gpt-4o-mini \
+  --only openai.tool_calls.basic,openai.tool_calls.stream
+```
+
+Tool call checks validate modern Chat Completions `tools` / `tool_calls`,
+including streaming `delta.tool_calls` argument assembly and JSON parsing. They
+are recommended checks, so failures do not fail the overall result while
+required checks pass. Legacy `function_call` is detected but is not treated as
+modern tool call compatibility.
+
 Quick demo with the local mock endpoint:
 
 ```bash
