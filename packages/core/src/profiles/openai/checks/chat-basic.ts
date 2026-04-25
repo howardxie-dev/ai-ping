@@ -4,7 +4,8 @@ import { checkResult, failureMessage } from "./result";
 import type { CheckContext, WireCheck } from "../../../types";
 
 const CHECK = {
-  id: "openai.chat.basic",
+  id: "openai-chat.chat.basic",
+  aliases: ["openai.chat.basic"],
   title: "Basic chat completion",
   category: "generation",
   severity: "required",

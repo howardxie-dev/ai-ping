@@ -19,14 +19,14 @@ describe("renderConsoleReport", () => {
       makeReport({
         results: [
           makeResult({
-            id: "openai.models.list",
+            id: "openai-chat.models.list",
             status: "pass",
             severity: "recommended",
             durationMs: 42,
             message: "Models list response is valid.",
           }),
           makeResult({
-            id: "openai.chat.stream",
+            id: "openai-chat.chat.stream",
             status: "fail",
             severity: "required",
             durationMs: 301,
@@ -47,13 +47,13 @@ describe("renderConsoleReport", () => {
     );
 
     expect(output).toContain("AI Ping");
-    expect(output).toContain("Profile:  openai");
+    expect(output).toContain("Profile:  openai-chat");
     expect(output).toContain("Endpoint: https://api.example.test/v1");
     expect(output).toContain("Model:    gpt-test");
     expect(output).toContain("Checks:   2");
-    expect(output).toContain("PASS  openai.models.list");
+    expect(output).toContain("PASS  openai-chat.models.list");
     expect(output).toContain("recommended  42ms");
-    expect(output).toContain("FAIL  openai.chat.stream");
+    expect(output).toContain("FAIL  openai-chat.chat.stream");
     expect(output).toContain("required     301ms");
     expect(output).toContain("  Required: 0 passed, 1 failed");
     expect(output).toContain("  Total:    1 passed, 0 warned, 1 failed, 0 skipped");

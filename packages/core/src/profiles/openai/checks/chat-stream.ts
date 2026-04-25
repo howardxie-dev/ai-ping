@@ -4,7 +4,8 @@ import { chatCompletionPayload } from "../payloads";
 import { checkResult, failureMessage, isRecord } from "./result";
 
 const CHECK = {
-  id: "openai.chat.stream",
+  id: "openai-chat.chat.stream",
+  aliases: ["openai.chat.stream"],
   title: "Streaming chat completion",
   category: "streaming",
   severity: "required",

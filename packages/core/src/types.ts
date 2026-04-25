@@ -45,6 +45,7 @@ export interface CheckResult {
 
 export interface WireCheck {
   id: string;
+  aliases?: readonly string[];
   title: string;
   category: CheckCategory;
   severity: CheckSeverity;
@@ -53,6 +54,7 @@ export interface WireCheck {
 
 export interface ProtocolProfile {
   id: string;
+  aliases?: readonly string[];
   name: string;
   description: string;
   checks: WireCheck[];

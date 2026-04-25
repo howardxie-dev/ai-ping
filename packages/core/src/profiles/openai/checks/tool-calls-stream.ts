@@ -8,7 +8,8 @@ import {
 import { checkResult, failureMessage } from "./result";
 
 const CHECK = {
-  id: "openai.tool_calls.stream",
+  id: "openai-chat.tool_calls.stream",
+  aliases: ["openai.tool_calls.stream"],
   title: "Streaming tool calls",
   category: "tools",
   severity: "recommended",

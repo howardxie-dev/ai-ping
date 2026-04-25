@@ -9,7 +9,10 @@ export function resolveApiKey(
 ): string | undefined {
   if (options.explicitApiKey) return options.explicitApiKey;
   if (options.env.AI_PING_API_KEY) return options.env.AI_PING_API_KEY;
-  if (options.profile === "openai" && options.env.OPENAI_API_KEY) {
+  if (
+    (options.profile === "openai" || options.profile === "openai-chat") &&
+    options.env.OPENAI_API_KEY
+  ) {
     return options.env.OPENAI_API_KEY;
   }
   if (options.profile === "gemini" && options.env.GEMINI_API_KEY) {

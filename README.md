@@ -23,7 +23,7 @@ AI Ping currently includes:
 
 - `@starroy/ai-ping-core`, the reusable protocol checking core
 - `@starroy/ai-ping`, the CLI package that provides the `aiping` command
-- OpenAI-compatible profile
+- OpenAI-compatible Chat Completions profile
 - Ollama profile
 - Gemini Developer API profile
 - Anthropic Claude Messages API profile
@@ -40,17 +40,17 @@ The npm package is published as `@starroy/ai-ping`, while the CLI command is
 
 ## Supported Profiles
 
-| Profile | API style | Authentication | Streaming |
-| --- | --- | --- | --- |
-| `openai` | OpenAI-compatible APIs | Usually requires an API key | SSE |
-| `ollama` | Ollama local APIs | No API key by default | JSON lines |
-| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE |
-| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE |
+| Profile | API style | Authentication | Streaming | Alias |
+| --- | --- | --- | --- | --- |
+| `openai-chat` | OpenAI-compatible Chat Completions API | Usually requires an API key | SSE | `openai` |
+| `ollama` | Ollama local APIs | No API key by default | JSON lines | |
+| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE | |
+| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE | |
 
 The `ollama` profile covers Ollama native `/api/tags`, `/api/generate`, and
 `/api/chat`. `/api/generate` is the prompt-style native API, while `/api/chat`
 is the messages-style native API. For Ollama's OpenAI-compatible
-`/v1/chat/completions`, use the `openai` profile instead.
+`/v1/chat/completions`, use the `openai-chat` profile instead.
 
 The `gemini` profile covers Gemini Developer API REST endpoints under a base URL
 such as `https://generativelanguage.googleapis.com/v1beta`. It uses
@@ -68,8 +68,13 @@ event-based SSE and is not OpenAI delta streaming. Tool use, extended thinking,
 computer use, Bedrock Anthropic, and Vertex AI Anthropic are not covered by this
 profile.
 
-The `openai` profile includes recommended checks for modern Chat Completions
-`tools` / `tool_calls`. These checks verify both non-streaming
+The `openai-chat` profile covers OpenAI-compatible Chat Completions APIs. The
+older `openai` profile name remains supported as a backward-compatible alias.
+Future OpenAI Responses API checks will use a separate profile and are not
+included yet.
+
+The `openai-chat` profile includes recommended checks for modern Chat
+Completions `tools` / `tool_calls`. These checks verify both non-streaming
 `choices[].message.tool_calls` and streaming `choices[].delta.tool_calls`
 argument assembly. Legacy `function_call` responses are detected but are not
 treated as passing modern tool call checks.
@@ -80,7 +85,7 @@ treated as passing modern tool call checks.
 import { runChecks } from "@starroy/ai-ping-core";
 
 const report = await runChecks({
-  profile: "openai",
+  profile: "openai-chat",
   baseUrl: "http://localhost:3000/v1",
   apiKey: "sk-test",
   model: "gpt-4o-mini",
@@ -135,7 +140,7 @@ In another terminal:
 npm install -g @starroy/ai-ping
 
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model demo-model
 ```
@@ -146,7 +151,7 @@ Run protocol checks:
 
 ```bash
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini
 ```
@@ -155,10 +160,10 @@ Check modern OpenAI-compatible tool calls only:
 
 ```bash
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini \
-  --only openai.tool_calls.basic,openai.tool_calls.stream
+  --only openai-chat.tool_calls.basic,openai-chat.tool_calls.stream
 ```
 
 Tool call checks are `recommended`: failures help diagnose agent and client
@@ -202,12 +207,13 @@ Use an API key from a flag or environment variable:
 
 ```bash
 AI_PING_API_KEY=sk-test aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini
 ```
 
-For the `openai` profile, `OPENAI_API_KEY` is also supported. For the `gemini`
+For the `openai-chat` profile, `OPENAI_API_KEY` is also supported. The legacy
+`openai` alias keeps the same environment variable behavior. For the `gemini`
 profile, `GEMINI_API_KEY` is also supported. For the `anthropic` profile,
 `ANTHROPIC_API_KEY` is also supported. The flag `--api-key` takes precedence
 over environment variables.
@@ -216,7 +222,7 @@ Output JSON for issue reports or CI artifacts:
 
 ```bash
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini \
   --json
@@ -226,17 +232,17 @@ List available profiles and checks:
 
 ```bash
 aiping profiles
-aiping checks --profile openai
+aiping checks --profile openai-chat
 ```
 
 Limit checks:
 
 ```bash
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini \
-  --only openai.chat.basic,openai.chat.stream
+  --only openai-chat.chat.basic,openai-chat.chat.stream
 ```
 
 Exit codes:
@@ -260,7 +266,7 @@ jobs:
       - run: npm install -g @starroy/ai-ping
       - run: |
           aiping check \
-            --profile openai \
+            --profile openai-chat \
             --base-url http://localhost:3000/v1 \
             --model test-model
 ```

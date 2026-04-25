@@ -21,12 +21,13 @@ export async function runChecksCommand(
     throw new CliUsageError("Missing required option: --profile");
   }
 
-  if (!deps.getProfile(options.profile)) {
+  const profile = deps.getProfile(options.profile);
+  if (!profile) {
     throw new CliUsageError(`Unsupported profile: ${options.profile}`);
   }
 
-  const lines = [`Checks for profile: ${options.profile}`];
-  for (const check of deps.listChecks(options.profile)) {
+  const lines = [`Checks for profile: ${profile.id}`];
+  for (const check of deps.listChecks(profile.id)) {
     lines.push(
       `${check.severity.padEnd(12, " ")} ${check.id.padEnd(22, " ")} ${check.title}`,
     );

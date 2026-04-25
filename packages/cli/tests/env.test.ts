@@ -27,10 +27,17 @@ describe("resolveApiKey", () => {
     ).toBe("ai-ping-key");
   });
 
-  it("uses OPENAI_API_KEY only for the openai profile", () => {
+  it("uses OPENAI_API_KEY for the openai alias and openai-chat profile", () => {
     expect(
       resolveApiKey({
         profile: "openai",
+        env: { OPENAI_API_KEY: "openai-key" },
+      }),
+    ).toBe("openai-key");
+
+    expect(
+      resolveApiKey({
+        profile: "openai-chat",
         env: { OPENAI_API_KEY: "openai-key" },
       }),
     ).toBe("openai-key");

@@ -47,7 +47,7 @@ describe("runCheckCommand", () => {
 
     expect(coreMocks.getProfile).toHaveBeenCalledWith("openai");
     expect(runChecks).toHaveBeenCalledWith({
-      profile: "openai",
+      profile: "openai-chat",
       baseUrl: "https://api.example.test/v1",
       model: "gpt-test",
       apiKey: "openai-key",
@@ -289,9 +289,10 @@ describe("runProfilesCommand", () => {
   it("lists available profiles and exits successfully", async () => {
     const profiles: ProtocolProfile[] = [
       makeProfile({
-        id: "openai",
-        name: "OpenAI-compatible",
-        description: "OpenAI-compatible APIs",
+        id: "openai-chat",
+        aliases: ["openai"],
+        name: "OpenAI Chat Completions",
+        description: "Checks OpenAI-compatible Chat Completions API behavior.",
       }),
       makeProfile({
         id: "ollama",
@@ -324,9 +325,10 @@ describe("runProfilesCommand", () => {
     expect(writeStdout).toHaveBeenCalledWith(
       [
         "Available profiles:",
-        "openai",
-        "  OpenAI-compatible",
-        "  OpenAI-compatible APIs",
+        "openai-chat",
+        "  OpenAI Chat Completions",
+        "  Checks OpenAI-compatible Chat Completions API behavior.",
+        "  Aliases: openai",
         "ollama",
         "  Ollama API",
         "  Checks common Ollama local API behaviors.",
@@ -362,10 +364,10 @@ describe("runChecksCommand", () => {
     );
 
     expect(getProfile).toHaveBeenCalledWith("openai");
-    expect(listChecks).toHaveBeenCalledWith("openai");
+    expect(listChecks).toHaveBeenCalledWith("openai-chat");
     expect(writeStdout).toHaveBeenCalledWith(
       [
-        "Checks for profile: openai",
+        "Checks for profile: openai-chat",
         "required     chat.basic             Chat basic",
         "recommended  chat.stream            Chat streaming",
       ].join("\n"),
@@ -379,32 +381,32 @@ describe("runChecksCommand", () => {
     const getProfile = vi.fn(() => makeProfile());
     const listChecks = vi.fn(() => [
       makeCheck({
-        id: "openai.models.list",
+        id: "openai-chat.models.list",
         severity: "recommended",
         title: "Models list",
       }),
       makeCheck({
-        id: "openai.chat.basic",
+        id: "openai-chat.chat.basic",
         severity: "required",
         title: "Basic chat completion",
       }),
       makeCheck({
-        id: "openai.chat.stream",
+        id: "openai-chat.chat.stream",
         severity: "required",
         title: "Streaming chat completion",
       }),
       makeCheck({
-        id: "openai.tool_calls.basic",
+        id: "openai-chat.tool_calls.basic",
         severity: "recommended",
         title: "Basic tool calls",
       }),
       makeCheck({
-        id: "openai.tool_calls.stream",
+        id: "openai-chat.tool_calls.stream",
         severity: "recommended",
         title: "Streaming tool calls",
       }),
       makeCheck({
-        id: "openai.error.format",
+        id: "openai-chat.error.format",
         severity: "recommended",
         title: "Error response format",
       }),
@@ -417,13 +419,13 @@ describe("runChecksCommand", () => {
 
     expect(writeStdout).toHaveBeenCalledWith(
       [
-        "Checks for profile: openai",
-        "recommended  openai.models.list     Models list",
-        "required     openai.chat.basic      Basic chat completion",
-        "required     openai.chat.stream     Streaming chat completion",
-        "recommended  openai.tool_calls.basic Basic tool calls",
-        "recommended  openai.tool_calls.stream Streaming tool calls",
-        "recommended  openai.error.format    Error response format",
+        "Checks for profile: openai-chat",
+        "recommended  openai-chat.models.list Models list",
+        "required     openai-chat.chat.basic Basic chat completion",
+        "required     openai-chat.chat.stream Streaming chat completion",
+        "recommended  openai-chat.tool_calls.basic Basic tool calls",
+        "recommended  openai-chat.tool_calls.stream Streaming tool calls",
+        "recommended  openai-chat.error.format Error response format",
       ].join("\n"),
     );
     expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);

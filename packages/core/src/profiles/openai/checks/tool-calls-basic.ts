@@ -10,7 +10,8 @@ import {
 import { checkResult, failureMessage } from "./result";
 
 const CHECK = {
-  id: "openai.tool_calls.basic",
+  id: "openai-chat.tool_calls.basic",
+  aliases: ["openai.tool_calls.basic"],
   title: "Basic tool calls",
   category: "tools",
   severity: "recommended",

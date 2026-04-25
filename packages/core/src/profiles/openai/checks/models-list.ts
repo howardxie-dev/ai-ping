@@ -2,7 +2,8 @@ import type { CheckContext, WireCheck } from "../../../types";
 import { checkResult, failureMessage, isRecord } from "./result";
 
 const CHECK = {
-  id: "openai.models.list",
+  id: "openai-chat.models.list",
+  aliases: ["openai.models.list"],
   title: "Models list",
   category: "models",
   severity: "recommended",

@@ -4,7 +4,8 @@ import { OpenAIErrorMinimumSchema } from "../schemas";
 import { checkResult, failureMessage } from "./result";
 
 const CHECK = {
-  id: "openai.error.format",
+  id: "openai-chat.error.format",
+  aliases: ["openai.error.format"],
   title: "Error response format",
   category: "errors",
   severity: "recommended",

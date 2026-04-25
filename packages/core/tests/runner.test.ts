@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { listChecks, listProfiles } from "../src/registry";
+import { getProfile, listChecks, listProfiles } from "../src/registry";
 import { runChecks } from "../src/runner";
 import { AiPingConfigError } from "../src/types";
 
@@ -27,11 +27,15 @@ function sseResponse(status: number, rawText: string): Response {
 describe("runChecks", () => {
   it("lists supported profiles and Ollama checks in registry order", () => {
     expect(listProfiles().map((profile) => profile.id)).toEqual([
-      "openai",
+      "openai-chat",
       "ollama",
       "gemini",
       "anthropic",
     ]);
+    expect(listProfiles().map((profile) => profile.id)).not.toContain("openai");
+    expect(listProfiles()[0]?.aliases).toEqual(["openai"]);
+    expect(getProfile("openai-chat")?.id).toBe("openai-chat");
+    expect(getProfile("openai")?.id).toBe("openai-chat");
     expect(listChecks("ollama").map((check) => check.id)).toEqual([
       "ollama.tags",
       "ollama.generate.basic",
@@ -51,13 +55,21 @@ describe("runChecks", () => {
       "anthropic.messages.stream",
       "anthropic.error.format",
     ]);
+    expect(listChecks("openai-chat").map((check) => check.id)).toEqual([
+      "openai-chat.models.list",
+      "openai-chat.chat.basic",
+      "openai-chat.chat.stream",
+      "openai-chat.tool_calls.basic",
+      "openai-chat.tool_calls.stream",
+      "openai-chat.error.format",
+    ]);
     expect(listChecks("openai").map((check) => check.id)).toEqual([
-      "openai.models.list",
-      "openai.chat.basic",
-      "openai.chat.stream",
-      "openai.tool_calls.basic",
-      "openai.tool_calls.stream",
-      "openai.error.format",
+      "openai-chat.models.list",
+      "openai-chat.chat.basic",
+      "openai-chat.chat.stream",
+      "openai-chat.tool_calls.basic",
+      "openai-chat.tool_calls.stream",
+      "openai-chat.error.format",
     ]);
   });
 
@@ -105,7 +117,7 @@ describe("runChecks", () => {
     });
 
     expect(report.tool).toBe("ai-ping");
-    expect(report.profile).toBe("openai");
+    expect(report.profile).toBe("openai-chat");
     expect(report.endpoint).toBe("https://example.test/v1/");
     expect(report.summary).toMatchObject({
       passed: 1,
@@ -143,7 +155,7 @@ describe("runChecks", () => {
     globalThis.fetch = fetchMock;
 
     const report = await runChecks({
-      profile: "openai",
+      profile: "openai-chat",
       baseUrl: "https://example.test/v1",
       model: "test-model",
       skip: [
@@ -154,9 +166,9 @@ describe("runChecks", () => {
     });
 
     expect(report.results.map((result) => result.id)).toEqual([
-      "openai.models.list",
-      "openai.chat.basic",
-      "openai.error.format",
+      "openai-chat.models.list",
+      "openai-chat.chat.basic",
+      "openai-chat.error.format",
     ]);
     expect(report.results[0]).toMatchObject({ status: "pass" });
     expect(report.results[1]).toMatchObject({ status: "warn" });
@@ -267,12 +279,12 @@ describe("runChecks", () => {
     });
 
     expect(report.results.map((result) => [result.id, result.status])).toEqual([
-      ["openai.models.list", "pass"],
-      ["openai.chat.basic", "pass"],
-      ["openai.chat.stream", "pass"],
-      ["openai.tool_calls.basic", "pass"],
-      ["openai.tool_calls.stream", "pass"],
-      ["openai.error.format", "pass"],
+      ["openai-chat.models.list", "pass"],
+      ["openai-chat.chat.basic", "pass"],
+      ["openai-chat.chat.stream", "pass"],
+      ["openai-chat.tool_calls.basic", "pass"],
+      ["openai-chat.tool_calls.stream", "pass"],
+      ["openai-chat.error.format", "pass"],
     ]);
     expect(report.summary).toMatchObject({
       passed: 6,

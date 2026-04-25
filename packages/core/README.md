@@ -4,26 +4,30 @@ Reusable protocol checks for AI and LLM API endpoints.
 
 ## Supported profiles
 
-| Profile | API style | Authentication | Streaming |
-| --- | --- | --- | --- |
-| `openai` | OpenAI-compatible APIs | Usually requires an API key | SSE |
-| `ollama` | Ollama local APIs | No API key by default | JSON lines |
-| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE |
-| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE |
+| Profile | API style | Authentication | Streaming | Alias |
+| --- | --- | --- | --- | --- |
+| `openai-chat` | OpenAI-compatible Chat Completions API | Usually requires an API key | SSE | `openai` |
+| `ollama` | Ollama local APIs | No API key by default | JSON lines | |
+| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE | |
+| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE | |
 
-The OpenAI-compatible profile currently includes:
+The OpenAI-compatible Chat Completions profile currently includes:
 
-- `openai.models.list`
-- `openai.chat.basic`
-- `openai.chat.stream`
-- `openai.tool_calls.basic`
-- `openai.tool_calls.stream`
-- `openai.error.format`
+- `openai-chat.models.list`
+- `openai-chat.chat.basic`
+- `openai-chat.chat.stream`
+- `openai-chat.tool_calls.basic`
+- `openai-chat.tool_calls.stream`
+- `openai-chat.error.format`
 
-The OpenAI-compatible tool call checks validate modern Chat Completions
-`tools` / `tool_calls`, including streaming `delta.tool_calls` argument
-assembly and JSON parsing. They are recommended checks; legacy `function_call`
-is detected but does not pass modern tool call compatibility.
+The canonical profile id is `openai-chat`. The older `openai` profile id remains
+supported as a backward-compatible alias. Future OpenAI Responses API checks
+will use a separate profile and are not included yet.
+
+The OpenAI-compatible tool call checks validate modern Chat Completions `tools`
+/ `tool_calls`, including streaming `delta.tool_calls` argument assembly and
+JSON parsing. They are recommended checks; legacy `function_call` is detected
+but does not pass modern tool call compatibility.
 
 The Ollama profile currently includes:
 
@@ -36,7 +40,7 @@ The Ollama profile currently includes:
 This covers Ollama native `/api/tags`, `/api/generate`, and `/api/chat`.
 `/api/generate` is Ollama's prompt-style native API, while `/api/chat` is its
 messages-style native API. For Ollama's OpenAI-compatible
-`/v1/chat/completions`, use the `openai` profile instead.
+`/v1/chat/completions`, use the `openai-chat` profile instead.
 
 The Gemini profile currently includes:
 
@@ -67,7 +71,7 @@ Vertex AI Anthropic are not covered by this profile.
 import { runChecks } from "@starroy/ai-ping-core";
 
 const report = await runChecks({
-  profile: "openai",
+  profile: "openai-chat",
   baseUrl: "http://localhost:3000/v1",
   apiKey: "sk-test",
   model: "gpt-4o-mini",

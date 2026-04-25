@@ -1,5 +1,5 @@
 import { createHttpClient } from "./http";
-import { getProfile } from "./registry";
+import { getProfile, resolveCheckId } from "./registry";
 import { buildSummary } from "./summary";
 import type {
   CheckResult,
@@ -10,7 +10,7 @@ import type {
 import { AiPingConfigError } from "./types";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
-const VERSION = "0.8.0";
+const VERSION = "0.8.1";
 
 export async function runChecks(
   options: RunChecksOptions,
@@ -90,14 +90,18 @@ function filterChecks(
   checks: WireCheck[],
   options: RunChecksOptions,
 ): WireCheck[] {
-  const only = new Set(options.only ?? []);
-  const skip = new Set(options.skip ?? []);
+  const only = new Set(resolveCheckIds(checks, options.only ?? []));
+  const skip = new Set(resolveCheckIds(checks, options.skip ?? []));
 
   return checks.filter((check) => {
     if (only.size > 0 && !only.has(check.id)) return false;
     if (skip.has(check.id)) return false;
     return true;
   });
+}
+
+function resolveCheckIds(checks: WireCheck[], ids: string[]): string[] {
+  return ids.map((id) => resolveCheckId(checks, id) ?? id);
 }
 
 function errorMessage(error: unknown): string {

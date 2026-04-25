@@ -370,14 +370,17 @@ describe("openaiErrorFormatCheck", () => {
 });
 
 describe("openai profile order", () => {
-  it("lists checks in the expected v0.3 order", () => {
-    expect(listChecks("openai").map((check) => check.id)).toEqual([
-      "openai.models.list",
-      "openai.chat.basic",
-      "openai.chat.stream",
-      "openai.tool_calls.basic",
-      "openai.tool_calls.stream",
-      "openai.error.format",
-    ]);
+  it("lists canonical checks for openai-chat and the openai alias", () => {
+    const expected = [
+      "openai-chat.models.list",
+      "openai-chat.chat.basic",
+      "openai-chat.chat.stream",
+      "openai-chat.tool_calls.basic",
+      "openai-chat.tool_calls.stream",
+      "openai-chat.error.format",
+    ];
+
+    expect(listChecks("openai-chat").map((check) => check.id)).toEqual(expected);
+    expect(listChecks("openai").map((check) => check.id)).toEqual(expected);
   });
 });

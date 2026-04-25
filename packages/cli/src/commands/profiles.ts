@@ -15,6 +15,9 @@ export async function runProfilesCommand(
     lines.push(profile.id);
     lines.push(`  ${profile.name}`);
     lines.push(`  ${profile.description}`);
+    if (profile.aliases && profile.aliases.length > 0) {
+      lines.push(`  Aliases: ${profile.aliases.join(", ")}`);
+    }
   }
 
   deps.writeStdout(lines.join("\n"));

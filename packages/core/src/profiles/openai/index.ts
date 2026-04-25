@@ -6,10 +6,11 @@ import { openaiToolCallsBasicCheck } from "./checks/tool-calls-basic";
 import { openaiToolCallsStreamCheck } from "./checks/tool-calls-stream";
 import type { ProtocolProfile } from "../../types";
 
-export const openaiProfile: ProtocolProfile = {
-  id: "openai",
-  name: "OpenAI-compatible API",
-  description: "Checks common OpenAI-compatible chat completion behaviors.",
+export const openaiChatProfile: ProtocolProfile = {
+  id: "openai-chat",
+  aliases: ["openai"],
+  name: "OpenAI Chat Completions",
+  description: "Checks OpenAI-compatible Chat Completions API behavior.",
   checks: [
     openaiModelsListCheck,
     openaiChatBasicCheck,

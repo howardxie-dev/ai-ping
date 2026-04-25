@@ -6,18 +6,23 @@ The npm package is `@starroy/ai-ping` and the installed command is `aiping`.
 
 ## Supported profiles
 
-| Profile | API style | Authentication | Streaming |
-| --- | --- | --- | --- |
-| `openai` | OpenAI-compatible APIs | Usually requires an API key | SSE |
-| `ollama` | Ollama local APIs | No API key by default | JSON lines |
-| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE |
-| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE |
+| Profile | API style | Authentication | Streaming | Alias |
+| --- | --- | --- | --- | --- |
+| `openai-chat` | OpenAI-compatible Chat Completions API | Usually requires an API key | SSE | `openai` |
+| `ollama` | Ollama local APIs | No API key by default | JSON lines | |
+| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE | |
+| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE | |
+
+The canonical OpenAI-compatible Chat Completions profile is `openai-chat`.
+The older `openai` profile name remains supported as a backward-compatible
+alias. Future OpenAI Responses API checks will use a separate profile and are
+not included yet.
 
 ## Usage
 
 ```bash
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini
 ```
@@ -26,10 +31,10 @@ Check modern OpenAI-compatible tool calls only:
 
 ```bash
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini \
-  --only openai.tool_calls.basic,openai.tool_calls.stream
+  --only openai-chat.tool_calls.basic,openai-chat.tool_calls.stream
 ```
 
 Tool call checks validate modern Chat Completions `tools` / `tool_calls`,
@@ -45,7 +50,7 @@ pnpm install
 pnpm --filter openai-compatible-mock dev
 
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model demo-model
 ```
@@ -65,7 +70,7 @@ SSE.
 The `ollama` profile checks Ollama native `/api/tags`, `/api/generate`, and
 `/api/chat`. `/api/generate` is the prompt-style native API, while `/api/chat`
 is the messages-style native API. For Ollama's OpenAI-compatible
-`/v1/chat/completions`, use the `openai` profile instead.
+`/v1/chat/completions`, use the `openai-chat` profile instead.
 
 Ollama checks currently include `ollama.tags`, `ollama.generate.basic`,
 `ollama.generate.stream`, `ollama.chat.basic`, and `ollama.chat.stream`.
@@ -102,7 +107,7 @@ Use JSON output for issue reports or CI artifacts:
 
 ```bash
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini \
   --json
@@ -112,7 +117,7 @@ List supported profiles and checks:
 
 ```bash
 aiping profiles
-aiping checks --profile openai
+aiping checks --profile openai-chat
 ```
 
 Exit codes:

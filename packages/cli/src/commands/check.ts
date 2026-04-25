@@ -34,7 +34,8 @@ export async function runCheckCommand(
   const model = requireOption(options.model, "--model");
   const timeoutMs = parseTimeout(options.timeout);
 
-  if (!getProfile(profile)) {
+  const resolvedProfile = getProfile(profile);
+  if (!resolvedProfile) {
     throw new CliUsageError(`Unsupported profile: ${profile}`);
   }
 
@@ -45,7 +46,7 @@ export async function runCheckCommand(
   });
 
   const report = await deps.runChecks({
-    profile,
+    profile: resolvedProfile.id,
     baseUrl,
     model,
     apiKey,

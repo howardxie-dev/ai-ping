@@ -11,7 +11,7 @@ export function makeResult(
   return {
     id: "chat.basic",
     title: "Chat basic",
-    profile: "openai",
+    profile: "openai-chat",
     category: "generation",
     severity: "required",
     status: "pass",
@@ -41,8 +41,8 @@ export function makeReport(
 
   return {
     tool: "ai-ping",
-    version: "0.8.0",
-    profile: "openai",
+    version: "0.8.1",
+    profile: "openai-chat",
     endpoint: "https://api.example.test/v1",
     model: "gpt-test",
     startedAt: "2026-04-24T08:00:00.000Z",
@@ -67,10 +67,12 @@ export function makeCheck(overrides: Partial<WireCheck> = {}): WireCheck {
 export function makeProfile(
   overrides: Partial<ProtocolProfile> = {},
 ): ProtocolProfile {
+  const id = overrides.id ?? "openai-chat";
   return {
-    id: "openai",
-    name: "OpenAI-compatible",
-    description: "OpenAI-compatible chat completions API",
+    id,
+    aliases: overrides.aliases ?? (id === "openai-chat" ? ["openai"] : undefined),
+    name: "OpenAI Chat Completions",
+    description: "Checks OpenAI-compatible Chat Completions API behavior.",
     checks: [makeCheck()],
     ...overrides,
   };

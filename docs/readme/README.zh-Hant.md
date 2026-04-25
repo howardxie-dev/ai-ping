@@ -21,21 +21,21 @@ AI Ping 目前包含兩個核心部分：
 
 - `@starroy/ai-ping-core`：可重用的協議檢查核心函式庫
 - `@starroy/ai-ping` CLI：命令列工具，提供 `aiping` 命令
-- `openai.models.list`：`/models` 最低相容結構檢查
+- `openai-chat.models.list`：`/models` 最低相容結構檢查
 
 目前支援的 profile：
 
-| Profile | API 形態 | 認證 | Streaming |
-| --- | --- | --- | --- |
-| `openai` | OpenAI-compatible API | 通常需要 API key | SSE |
-| `ollama` | Ollama 本機 API | 預設不需要 API key | JSON lines |
-| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE |
-| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE |
+| Profile | API 形態 | 認證 | Streaming | Alias |
+| --- | --- | --- | --- | --- |
+| `openai-chat` | OpenAI-compatible Chat Completions API | 通常需要 API key | SSE | `openai` |
+| `ollama` | Ollama 本機 API | 預設不需要 API key | JSON lines | |
+| `gemini` | Gemini Developer API REST | `x-goog-api-key` | SSE | |
+| `anthropic` | Anthropic Claude Messages API | `x-api-key` + `anthropic-version` | SSE | |
 
 `ollama` profile 覆蓋 Ollama native `/api/tags`、`/api/generate` 和
 `/api/chat`。`/api/generate` 是 prompt-style native API，`/api/chat` 是
 messages-style native API。Ollama OpenAI-compatible `/v1/chat/completions`
-應使用 `openai` profile 檢查。
+應使用 `openai-chat` profile 檢查。
 
 `gemini` profile 覆蓋 Gemini Developer API REST，base URL 範例為
 `https://generativelanguage.googleapis.com/v1beta`。它透過 `--api-key`、
@@ -62,7 +62,11 @@ Bedrock Anthropic 與 Vertex AI Anthropic 不屬於此 profile。
 - Anthropic checks：`anthropic.models.list`、`anthropic.messages.basic`、`anthropic.messages.stream`、`anthropic.error.format`
 - 結構化報告，支援 `pass`、`warn`、`fail`、`skip`
 
-`openai` profile 包含 modern Chat Completions `tools` / `tool_calls` 的
+`openai-chat` 是 OpenAI-compatible Chat Completions 的規範 profile 名稱。
+舊的 `openai` 名稱仍作為向後相容 alias 可用。未來 OpenAI Responses API
+檢查會使用獨立的 `openai-responses` profile，目前尚未包含。
+
+`openai-chat` profile 包含 modern Chat Completions `tools` / `tool_calls` 的
 recommended checks。它會檢查非串流 `choices[].message.tool_calls`，也會檢查
 串流 `choices[].delta.tool_calls` 的 arguments 拼接與 JSON parse。legacy
 `function_call` 會被偵測出來，但不會被當作 modern `tool_calls` 通過。
@@ -100,7 +104,7 @@ pnpm --filter openai-compatible-mock dev
 npm install -g @starroy/ai-ping
 
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model demo-model
 ```
@@ -111,7 +115,7 @@ AI Ping 檢查的是協議行為，不是單純的網路連通性。
 
 ```bash
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini
 ```
@@ -120,10 +124,10 @@ aiping check \
 
 ```bash
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini \
-  --only openai.tool_calls.basic,openai.tool_calls.stream
+  --only openai-chat.tool_calls.basic,openai-chat.tool_calls.stream
 ```
 
 tool call checks 是 `recommended`，用於診斷 agent / client 相容性。只要
@@ -141,7 +145,7 @@ aiping check \
 Ollama 不需要 API key。它的 streaming 回應使用 JSON lines，不是 SSE。
 
 Ollama OpenAI-compatible `/v1/chat/completions` 不屬於 `ollama` native
-profile 覆蓋範圍，請使用 `openai` profile 檢查。
+profile 覆蓋範圍，請使用 `openai-chat` profile 檢查。
 
 檢查 Gemini Developer API：
 
@@ -165,14 +169,14 @@ ANTHROPIC_API_KEY=your-key aiping check \
 
 ```bash
 AI_PING_API_KEY=sk-test aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini
 ```
 
-對於 `openai` profile，也支援 `OPENAI_API_KEY`。對於 `gemini` profile，
-也支援 `GEMINI_API_KEY`。對於 `anthropic` profile，也支援
-`ANTHROPIC_API_KEY`。優先順序為：
+對於 `openai-chat` profile，也支援 `OPENAI_API_KEY`。舊的 `openai` alias
+保留相同的環境變數行為。對於 `gemini` profile，也支援 `GEMINI_API_KEY`。
+對於 `anthropic` profile，也支援 `ANTHROPIC_API_KEY`。優先順序為：
 
 1. `--api-key`
 2. `AI_PING_API_KEY`
@@ -182,7 +186,7 @@ AI_PING_API_KEY=sk-test aiping check \
 
 ```bash
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini \
   --json
@@ -192,27 +196,27 @@ aiping check \
 
 ```bash
 aiping profiles
-aiping checks --profile openai
+aiping checks --profile openai-chat
 ```
 
 只執行部分 checks：
 
 ```bash
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini \
-  --only openai.chat.basic,openai.chat.stream
+  --only openai-chat.chat.basic,openai-chat.chat.stream
 ```
 
 略過部分 checks：
 
 ```bash
 aiping check \
-  --profile openai \
+  --profile openai-chat \
   --base-url http://localhost:3000/v1 \
   --model gpt-4o-mini \
-  --skip openai.error.format
+  --skip openai-chat.error.format
 ```
 
 ## Exit Codes
@@ -230,7 +234,7 @@ aiping check \
 import { runChecks } from "@starroy/ai-ping-core";
 
 const report = await runChecks({
-  profile: "openai",
+  profile: "openai-chat",
   baseUrl: "http://localhost:3000/v1",
   apiKey: "sk-test",
   model: "gpt-4o-mini",
@@ -256,7 +260,7 @@ jobs:
       - run: npm install -g @starroy/ai-ping
       - run: |
           aiping check \
-            --profile openai \
+            --profile openai-chat \
             --base-url http://localhost:3000/v1 \
             --model test-model
 ```
