@@ -4,7 +4,9 @@ import { resolveApiKey } from "../env";
 import { CliUsageError, getExitCodeFromReport } from "../exit-code";
 import { parseListOption } from "../parse-list";
 import { renderConsoleReport } from "../renderers/console";
+import { renderHtmlReport } from "../renderers/html";
 import { renderJsonReport } from "../renderers/json";
+import { writeTextFileEnsuringDir } from "../write-file";
 
 export interface CheckCommandOptions {
   profile?: string;
@@ -16,23 +18,37 @@ export interface CheckCommandOptions {
   only?: string | string[];
   skip?: string | string[];
   verbose?: boolean;
+  html?: string;
 }
 
 export interface CheckCommandDeps {
   runChecks: (options: RunChecksOptions) => Promise<WireCheckReport>;
   env: Record<string, string | undefined>;
   writeStdout: (text: string) => void;
+  renderHtmlReport: (report: WireCheckReport) => string;
+  writeTextFileEnsuringDir: (filePath: string, text: string) => Promise<void>;
   setExitCode: (code: number) => void;
+}
+
+export class CliRuntimeError extends Error {
+  readonly exitCode = 3;
+
+  constructor(message: string) {
+    super(message);
+    this.name = "CliRuntimeError";
+  }
 }
 
 export async function runCheckCommand(
   options: CheckCommandOptions,
-  deps: CheckCommandDeps = defaultDeps(),
+  deps: Partial<CheckCommandDeps> = {},
 ): Promise<void> {
+  const resolvedDeps = { ...defaultDeps(), ...deps };
   const profile = requireOption(options.profile, "--profile");
   const baseUrl = requireOption(options.baseUrl, "--base-url");
   const model = requireOption(options.model, "--model");
   const timeoutMs = parseTimeout(options.timeout);
+  const htmlPath = parseHtmlPath(options.html);
 
   const resolvedProfile = getProfile(profile);
   if (!resolvedProfile) {
@@ -42,10 +58,10 @@ export async function runCheckCommand(
   const apiKey = resolveApiKey({
     explicitApiKey: options.apiKey,
     profile,
-    env: deps.env,
+    env: resolvedDeps.env,
   });
 
-  const report = await deps.runChecks({
+  const report = await resolvedDeps.runChecks({
     profile: resolvedProfile.id,
     baseUrl,
     model,
@@ -55,12 +71,23 @@ export async function runCheckCommand(
     skip: parseListOption(options.skip),
   });
 
-  deps.writeStdout(
-    options.json
-      ? renderJsonReport(report)
-      : renderConsoleReport(report, { verbose: options.verbose }),
-  );
-  deps.setExitCode(getExitCodeFromReport(report));
+  if (htmlPath) {
+    await writeHtmlReport(htmlPath, report, resolvedDeps);
+  }
+
+  if (options.json) {
+    resolvedDeps.writeStdout(renderJsonReport(report));
+  } else {
+    const output = [
+      renderConsoleReport(report, { verbose: options.verbose }),
+      htmlPath ? `HTML report written to: ${htmlPath}` : undefined,
+    ]
+      .filter((line): line is string => Boolean(line))
+      .join("\n");
+
+    resolvedDeps.writeStdout(output);
+  }
+  resolvedDeps.setExitCode(getExitCodeFromReport(report));
 }
 
 function requireOption(value: string | undefined, optionName: string): string {
@@ -78,6 +105,30 @@ function parseTimeout(value: string | number | undefined): number | undefined {
   return parsed;
 }
 
+function parseHtmlPath(value: string | undefined): string | undefined {
+  if (value === undefined) return undefined;
+  if (value.trim().length === 0) {
+    throw new CliUsageError("Missing required option: --html");
+  }
+  return value;
+}
+
+async function writeHtmlReport(
+  htmlPath: string,
+  report: WireCheckReport,
+  deps: CheckCommandDeps,
+): Promise<void> {
+  try {
+    await deps.writeTextFileEnsuringDir(
+      htmlPath,
+      deps.renderHtmlReport(report),
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new CliRuntimeError(`Failed to write HTML report: ${message}`);
+  }
+}
+
 function defaultDeps(): CheckCommandDeps {
   return {
     runChecks,
@@ -88,5 +139,7 @@ function defaultDeps(): CheckCommandDeps {
     setExitCode: (code) => {
       process.exitCode = code;
     },
+    renderHtmlReport,
+    writeTextFileEnsuringDir,
   };
 }

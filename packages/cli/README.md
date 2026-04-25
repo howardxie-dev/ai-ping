@@ -23,7 +23,7 @@ The OpenAI-compatible Responses profile is `openai-responses`. It sends
 Responses-style `input` requests to `POST /responses` and validates `output`,
 `output_text`, and semantic streaming events such as
 `response.output_text.delta`. It does not check Responses tools, built-in tools,
-multimodal input, or conversation state in v0.9.
+multimodal input, or conversation state in v0.10.
 
 ## Usage
 
@@ -134,6 +134,19 @@ aiping check \
   --json
 ```
 
+Write a static HTML report for sharing, screenshots, or CI artifacts:
+
+```bash
+aiping check \
+  --profile openai-chat \
+  --base-url http://localhost:3000/v1 \
+  --model gpt-4o-mini \
+  --html reports/aiping.html
+```
+
+`--html` can be combined with `--json`; stdout remains pure JSON while the HTML
+file is written separately.
+
 List supported profiles and checks:
 
 ```bash
@@ -148,3 +161,28 @@ Exit codes:
 - `1`: checks completed and at least one required check failed
 - `2`: usage or configuration error
 - `3`: unexpected CLI runtime error
+
+CI artifact example:
+
+```yaml
+name: AI Ping
+on:
+  pull_request:
+jobs:
+  ai-ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install -g @starroy/ai-ping
+      - run: |
+          aiping check \
+            --profile openai-chat \
+            --base-url http://localhost:3000/v1 \
+            --model test-model \
+            --html reports/aiping.html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ai-ping-report
+          path: reports/aiping.html
+```

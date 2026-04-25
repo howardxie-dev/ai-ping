@@ -1,4 +1,5 @@
 import cac from "cac";
+import packageJson from "../package.json";
 import { runCheckCommand } from "./commands/check";
 import { runChecksCommand } from "./commands/checks";
 import { runProfilesCommand } from "./commands/profiles";
@@ -14,6 +15,7 @@ export async function main(argv = process.argv): Promise<void> {
     .option("--api-key <apiKey>", "API key")
     .option("--timeout <timeout>", "Timeout in milliseconds")
     .option("--json", "Output JSON report")
+    .option("--html <file>", "Write an HTML report to a file")
     .option("--only <checks>", "Only run selected checks")
     .option("--skip <checks>", "Skip selected checks")
     .option("--verbose", "Print verbose details")
@@ -29,7 +31,7 @@ export async function main(argv = process.argv): Promise<void> {
     .action(runChecksCommand);
 
   cli.help();
-  cli.version("0.9.0");
+  cli.version(packageJson.version);
   cli.parse(argv, { run: false });
   await cli.runMatchedCommand();
 }

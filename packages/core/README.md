@@ -42,7 +42,7 @@ The canonical profile id is `openai-responses`. It covers `POST /responses`,
 sends Responses-style `input` requests, and validates `output`, `output_text`,
 and semantic streaming events such as `response.output_text.delta`. It does not
 check Responses tools, built-in tools, multimodal input, or conversation state
-in v0.9.
+in v0.10.
 
 The Ollama profile currently includes:
 
@@ -133,4 +133,6 @@ SSE.
 
 `runChecks` returns a structured report and does not print, write files, set
 exit codes, or manage UI state. Future CLI and desktop entry points should
-consume this package instead of reimplementing checks.
+consume this package instead of reimplementing checks. The CLI can render the
+same structured report as console, JSON, or a static HTML report with
+`aiping check --html reports/aiping.html`.

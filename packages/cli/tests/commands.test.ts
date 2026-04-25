@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ProtocolProfile, RunChecksOptions } from "@starroy/ai-ping-core";
-import { runCheckCommand } from "../src/commands/check";
+import { CliRuntimeError, runCheckCommand } from "../src/commands/check";
 import { runChecksCommand } from "../src/commands/checks";
 import { runProfilesCommand } from "../src/commands/profiles";
 import { CliUsageError, EXIT_CHECK_FAILED, EXIT_OK } from "../src/exit-code";
@@ -102,6 +102,94 @@ describe("runCheckCommand", () => {
     );
     expect(writeStdout).toHaveBeenCalledWith(JSON.stringify(report, null, 2));
     expect(setExitCode).toHaveBeenCalledWith(EXIT_CHECK_FAILED);
+  });
+
+  it("writes an HTML report and appends the path in console mode", async () => {
+    const report = makeReport();
+    const runChecks = vi.fn().mockResolvedValue(report);
+    const renderHtmlReport = vi.fn(() => "<!doctype html><html></html>");
+    const writeTextFileEnsuringDir = vi.fn().mockResolvedValue(undefined);
+    const writeStdout = vi.fn();
+    const setExitCode = vi.fn();
+
+    await runCheckCommand(
+      {
+        profile: "openai",
+        baseUrl: "https://api.example.test/v1",
+        model: "gpt-test",
+        html: "reports/aiping.html",
+      },
+      {
+        runChecks,
+        env: { OPENAI_API_KEY: "openai-key" },
+        renderHtmlReport,
+        writeTextFileEnsuringDir,
+        writeStdout,
+        setExitCode,
+      },
+    );
+
+    expect(renderHtmlReport).toHaveBeenCalledWith(report);
+    expect(writeTextFileEnsuringDir).toHaveBeenCalledWith(
+      "reports/aiping.html",
+      "<!doctype html><html></html>",
+    );
+    expect(writeStdout).toHaveBeenCalledWith(
+      expect.stringContaining("HTML report written to: reports/aiping.html"),
+    );
+    expect(setExitCode).toHaveBeenCalledWith(EXIT_OK);
+  });
+
+  it("keeps JSON stdout pure when an HTML report is also written", async () => {
+    const report = makeReport();
+    const runChecks = vi.fn().mockResolvedValue(report);
+    const writeStdout = vi.fn();
+
+    await runCheckCommand(
+      {
+        profile: "openai",
+        baseUrl: "https://api.example.test/v1",
+        model: "gpt-test",
+        json: true,
+        html: "reports/aiping.html",
+      },
+      {
+        runChecks,
+        env: { OPENAI_API_KEY: "openai-key" },
+        renderHtmlReport: vi.fn(() => "<html></html>"),
+        writeTextFileEnsuringDir: vi.fn().mockResolvedValue(undefined),
+        writeStdout,
+        setExitCode: vi.fn(),
+      },
+    );
+
+    expect(writeStdout).toHaveBeenCalledWith(JSON.stringify(report, null, 2));
+    expect(writeStdout.mock.calls[0][0]).not.toContain("HTML report written to:");
+  });
+
+  it("throws a runtime error when writing an HTML report fails", async () => {
+    await expect(
+      runCheckCommand(
+        {
+          profile: "openai",
+          baseUrl: "https://api.example.test/v1",
+          model: "gpt-test",
+          html: "reports/aiping.html",
+        },
+        {
+          runChecks: vi.fn().mockResolvedValue(makeReport()),
+          env: { OPENAI_API_KEY: "openai-key" },
+          renderHtmlReport: vi.fn(() => "<html></html>"),
+          writeTextFileEnsuringDir: vi
+            .fn()
+            .mockRejectedValue(new Error("permission denied")),
+          writeStdout: vi.fn(),
+          setExitCode: vi.fn(),
+        },
+      ),
+    ).rejects.toThrow(
+      new CliRuntimeError("Failed to write HTML report: permission denied"),
+    );
   });
 
   it("runs Ollama checks without requiring an API key", async () => {
@@ -281,6 +369,28 @@ describe("runCheckCommand", () => {
       ).rejects.toThrow(
         new CliUsageError("Invalid option: --timeout must be a positive integer"),
       );
+    },
+  );
+
+  it.each(["", "   "])(
+    "throws a usage error for an empty HTML report path %j",
+    async (html) => {
+    await expect(
+      runCheckCommand(
+        {
+          profile: "openai",
+          baseUrl: "https://api.example.test/v1",
+          model: "gpt-test",
+          html,
+        },
+        {
+          runChecks: vi.fn(),
+          env: {},
+          writeStdout: vi.fn(),
+          setExitCode: vi.fn(),
+        },
+      ),
+    ).rejects.toThrow(new CliUsageError("Missing required option: --html"));
     },
   );
 });

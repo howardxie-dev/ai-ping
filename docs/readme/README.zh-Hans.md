@@ -219,6 +219,18 @@ aiping check \
   --json
 ```
 
+写入静态 HTML 报告，便于分享、截图或作为 CI artifact 上传：
+
+```bash
+aiping check \
+  --profile openai-chat \
+  --base-url http://localhost:3000/v1 \
+  --model gpt-4o-mini \
+  --html reports/aiping.html
+```
+
+`--html` 可以和 `--json` 一起使用；stdout 仍然只输出纯 JSON，HTML 文件会单独写入。
+
 列出可用 profiles 和 checks：
 
 ```bash
@@ -290,7 +302,13 @@ jobs:
           aiping check \
             --profile openai-chat \
             --base-url http://localhost:3000/v1 \
-            --model test-model
+            --model test-model \
+            --html reports/aiping.html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ai-ping-report
+          path: reports/aiping.html
 ```
 
 ## 开发

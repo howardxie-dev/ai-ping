@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.10.0
+
+### Added
+
+- Added `aiping check --html <file>` to write a static HTML report.
+- Added CLI handling so console output reports the written HTML path, while
+  `--json --html` keeps stdout as pure JSON.
+- Added README examples for HTML reports and CI artifact upload.
+
+### Changed
+
+- Bumped workspace, core, and CLI package versions to `0.10.0`.
+
 ## 0.9.0
 
 ### Added

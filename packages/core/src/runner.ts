@@ -1,6 +1,7 @@
 import { createHttpClient } from "./http";
 import { getProfile, resolveCheckId } from "./registry";
 import { buildSummary } from "./summary";
+import packageJson from "../package.json";
 import type {
   CheckResult,
   RunChecksOptions,
@@ -10,7 +11,7 @@ import type {
 import { AiPingConfigError } from "./types";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
-const VERSION = "0.8.1";
+const VERSION = packageJson.version;
 
 export async function runChecks(
   options: RunChecksOptions,

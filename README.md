@@ -250,6 +250,19 @@ aiping check \
   --json
 ```
 
+Write a static HTML report for sharing, screenshots, or CI artifacts:
+
+```bash
+aiping check \
+  --profile openai-chat \
+  --base-url http://localhost:3000/v1 \
+  --model gpt-4o-mini \
+  --html reports/aiping.html
+```
+
+`--html` can be combined with `--json`; stdout remains pure JSON while the HTML
+file is written separately.
+
 List available profiles and checks:
 
 ```bash
@@ -291,7 +304,13 @@ jobs:
           aiping check \
             --profile openai-chat \
             --base-url http://localhost:3000/v1 \
-            --model test-model
+            --model test-model \
+            --html reports/aiping.html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ai-ping-report
+          path: reports/aiping.html
 ```
 
 ## Non-goals
