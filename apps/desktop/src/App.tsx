@@ -4,12 +4,7 @@ import type {
   ProtocolProfile,
   WireCheckReport,
 } from "@starroy/ai-ping-core";
-import { useEffect, useMemo, useState } from "react";
-import {
-  getNextProfilePreferences,
-  loadDesktopPreferences,
-  saveDesktopPreferences,
-} from "./lib/desktop-preferences";
+import { useMemo, useState } from "react";
 import { exportReport, formatJsonReport } from "./lib/export-report";
 import {
   getProfileDefaults,
@@ -22,22 +17,15 @@ type RunState = "idle" | "running" | "done" | "error";
 type AttentionLevel = "idle" | "running" | "ok" | "attention" | "failed";
 
 const profiles = listProfiles();
-const profileIds = profiles.map((profile) => profile.id);
 const initialProfile = profiles[0]?.id ?? "";
-const initialPreferences = loadDesktopPreferences({
-  availableProfiles: profileIds,
-  fallbackProfile: initialProfile,
-});
+const initialDefaults = getProfileDefaults(initialProfile);
 
 export function App() {
-  const [profile, setProfile] = useState(initialPreferences.profile);
-  const [baseUrl, setBaseUrl] = useState(initialPreferences.baseUrl);
-  const [model, setModel] = useState(initialPreferences.model);
+  const [profile, setProfile] = useState(initialProfile);
+  const [baseUrl, setBaseUrl] = useState(initialDefaults.baseUrl);
+  const [model, setModel] = useState(initialDefaults.model);
   const [apiKey, setApiKey] = useState("");
-  const [timeoutSeconds, setTimeoutSeconds] = useState(initialPreferences.timeoutSeconds);
-  const [profilePreferences, setProfilePreferences] = useState(
-    initialPreferences.profiles,
-  );
+  const [timeoutSeconds, setTimeoutSeconds] = useState(30);
   const [runState, setRunState] = useState<RunState>("idle");
   const [report, setReport] = useState<WireCheckReport | null>(null);
   const [selectedCheckId, setSelectedCheckId] = useState<string | null>(null);
@@ -58,31 +46,11 @@ export function App() {
   const attention = getAttentionLevel(runState, report);
   const topIssues = useMemo(() => getTopIssues(report), [report]);
 
-  useEffect(() => {
-    saveDesktopPreferences({
-      profile,
-      baseUrl,
-      model,
-      timeoutSeconds,
-      profiles: profilePreferences,
-    });
-  }, [baseUrl, model, profile, profilePreferences, timeoutSeconds]);
-
   function handleProfileChange(nextProfile: string) {
-    const nextPreferences = getNextProfilePreferences(
-      {
-        profile,
-        baseUrl,
-        model,
-        timeoutSeconds,
-        profiles: profilePreferences,
-      },
-      nextProfile,
-    );
-    setProfile(nextPreferences.profile);
-    setBaseUrl(nextPreferences.baseUrl);
-    setModel(nextPreferences.model);
-    setProfilePreferences(nextPreferences.profiles);
+    const defaults = getProfileDefaults(nextProfile);
+    setProfile(nextProfile);
+    setBaseUrl(defaults.baseUrl);
+    setModel(defaults.model);
     setSelectedCheckId(null);
   }
 
@@ -223,11 +191,6 @@ export function App() {
           </div>
           {errors.timeoutMs ? <small className="error">{errors.timeoutMs}</small> : null}
         </label>
-
-        <p className="hint persistence-hint">
-          Profile, base URL, model, and timeout are restored on next launch. API
-          keys are not saved.
-        </p>
 
         <div className="side-actions">
           <button

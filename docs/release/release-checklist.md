@@ -18,11 +18,11 @@ Use this checklist for AI Ping v1.0 and later 1.x releases.
 - [ ] `pnpm typecheck`
 - [ ] `pnpm build`
 - [ ] `pnpm pack:check`
-- [ ] For v1.2 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop test`
-- [ ] For v1.2 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop typecheck`
-- [ ] For v1.2 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop build`
-- [ ] For v1.2 Desktop Preview: `pnpm desktop:build:app`
-- [ ] For v1.2 Desktop Preview: `pnpm desktop:build:dmg`
+- [ ] For v1.1 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop test`
+- [ ] For v1.1 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop typecheck`
+- [ ] For v1.1 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop build`
+- [ ] For v1.1 Desktop Preview: `pnpm desktop:build:app`
+- [ ] For v1.1 Desktop Preview: `pnpm desktop:build:dmg`
 
 ## Desktop Preview Smoke
 
@@ -35,11 +35,7 @@ Use this checklist for AI Ping v1.0 and later 1.x releases.
 - [ ] Run one check with a known local or disposable endpoint
 - [ ] Export one JSON report
 - [ ] Export one HTML report
-- [ ] Confirm non-sensitive desktop configuration is restored after relaunch
-- [ ] Confirm saved configuration does not include API keys or Authorization
-      headers
-- [ ] Confirm API keys are kept in memory only and are not persisted after
-      relaunch
+- [ ] Confirm API keys are kept in memory only and are not persisted
 - [ ] Confirm the build is unsigned / ad-hoc unless Developer ID signing and
       notarization are explicitly enabled for the release
 

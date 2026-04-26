@@ -63,7 +63,7 @@ importers:
   packages/cli:
     dependencies:
       '@starroy/ai-ping-core':
-        specifier: 1.2.0
+        specifier: 1.1.0
         version: link:../core
       cac:
         specifier: ^6.7.14

@@ -28,7 +28,7 @@ CLI 包名是 `@starroy/ai-ping`，命令名是 `aiping`。可复用 Core 库包
 
 ## Desktop Preview
 
-AI Ping v1.2 包含 macOS-first 的 Tauri Desktop Preview。它提供本地 UI，用于选择
+AI Ping v1.1 新增 macOS-first 的 Tauri Desktop Preview。它提供本地 UI，用于选择
 profile、填写 base URL、model、API key 和 timeout，运行 checks，查看结果，并导出
 JSON 或 HTML report。
 
@@ -38,9 +38,8 @@ pnpm desktop:dev
 pnpm desktop:build:dmg
 ```
 
-Desktop Preview 不替代 CLI，也不新增 checks 或 profiles。它可以保存非敏感的桌面
-配置，但 API key 只保留在内存中，不会被保存。Windows / Linux 打包、notarization
-和自动更新会放到后续版本。
+Desktop Preview 不替代 CLI，不保存 API key，也不新增 checks 或 profiles。Windows /
+Linux 打包、notarization、自动更新、保存设置和历史记录会放到后续版本。
 
 本地 DMG 构建是 unsigned / ad-hoc，仅用于本地预览验证。打包命令、smoke checks
 和预览限制详见 [apps/desktop/README.md](../../apps/desktop/README.md)。

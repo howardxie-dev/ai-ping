@@ -4,12 +4,9 @@
 
 ## Status
 
-- Preview quality for v1.2.
+- Preview quality for v1.1.
 - macOS is the primary target.
-- The Desktop Preview may save non-sensitive desktop configuration so the next
-  launch can restore the last-used workflow.
-- API keys are kept only in React component state. They are not written to
-  localStorage, sessionStorage, IndexedDB, saved configuration, or logs.
+- API keys are kept only in React component state. They are not written to localStorage, sessionStorage, IndexedDB, or logs.
 - Export uses Tauri dialog and filesystem plugins. Browser-only Vite runs can execute checks, but export actions show a graceful desktop-only error.
 - Checks run in the frontend preview path and can still be affected by endpoint CORS behavior.
 
@@ -42,7 +39,7 @@ pnpm desktop:build:dmg
 desktop:build:dmg` builds a drag-to-Applications DMG with the project icon and
 DMG background configured in `src-tauri/tauri.conf.json`.
 
-The v1.2 Desktop Preview package is unsigned / ad-hoc by default. It is suitable
+The v1.1 Desktop Preview package is unsigned / ad-hoc by default. It is suitable
 for local installation checks, but it is not yet notarized for public macOS
 distribution. Developer ID signing and Apple notarization are intentionally kept
 out of the default build path.
@@ -51,7 +48,7 @@ Expected local artifacts:
 
 ```text
 apps/desktop/src-tauri/target/release/bundle/macos/AI Ping Desktop Preview.app
-apps/desktop/src-tauri/target/release/bundle/dmg/AI Ping Desktop Preview_<version>_aarch64.dmg
+apps/desktop/src-tauri/target/release/bundle/dmg/AI Ping Desktop Preview_1.1.0_aarch64.dmg
 ```
 
 ## Smoke Checklist
@@ -61,7 +58,6 @@ apps/desktop/src-tauri/target/release/bundle/dmg/AI Ping Desktop Preview_<versio
 - Confirm the app icon and DMG background render correctly.
 - Select a profile and run a check with a known endpoint.
 - Export JSON and HTML reports.
-- Confirm non-sensitive configuration can be restored.
 - Confirm API keys are not saved after closing the app.
 
 During integration, `@starroy/ai-ping-report` must provide `renderHtmlReport(report)` and the workspace must include this app.
