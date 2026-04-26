@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "../..",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@starroy/ai-ping-core": ["../core/src/index.ts"]
+    }
+  },
+  "include": ["src", "tests"]
+}

@@ -43,7 +43,7 @@ describe("WireCheckReport schema stability", () => {
     expect(report).toEqual(
       expect.objectContaining({
         tool: "ai-ping",
-        version: "1.0.0",
+        version: "1.1.0",
         profile: "openai-chat",
         endpoint: "https://example.test/v1",
         model: "test-model",

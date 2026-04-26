@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.1.0
+
+### Added
+
+- Added a macOS-first Tauri Desktop Preview under `apps/desktop`.
+- Added UI support for selecting profiles, entering endpoint/model/API key
+  settings, running checks, viewing summaries and details, and exporting JSON
+  or HTML reports.
+- Added `@starroy/ai-ping-report` as a private shared workspace package for
+  report rendering.
+
+### Changed
+
+- Moved the static HTML report renderer out of the CLI and into the shared
+  report package.
+- Kept CLI HTML output behavior unchanged while bundling the private report
+  renderer into the published CLI package.
+- Updated workspace scripts and documentation for Desktop Preview development.
+
+### Notes
+
+- Desktop Preview is macOS-first and preview quality. Windows and Linux
+  packaging, notarization, auto update, saved settings, and history are outside
+  this release.
+- Desktop Preview does not persist API keys.
+
 ## 1.0.0
 
 ### Stable

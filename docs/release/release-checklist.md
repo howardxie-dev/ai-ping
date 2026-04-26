@@ -18,6 +18,26 @@ Use this checklist for AI Ping v1.0 and later 1.x releases.
 - [ ] `pnpm typecheck`
 - [ ] `pnpm build`
 - [ ] `pnpm pack:check`
+- [ ] For v1.1 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop test`
+- [ ] For v1.1 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop typecheck`
+- [ ] For v1.1 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop build`
+- [ ] For v1.1 Desktop Preview: `pnpm desktop:build:app`
+- [ ] For v1.1 Desktop Preview: `pnpm desktop:build:dmg`
+
+## Desktop Preview Smoke
+
+- [ ] Open `AI Ping Desktop Preview.app`
+- [ ] Confirm the app title is `AI Ping Desktop Preview`
+- [ ] Confirm the app icon renders in Finder and Dock
+- [ ] Open the DMG and confirm the background image renders
+- [ ] Confirm the DMG contains `AI Ping Desktop Preview.app` and `Applications`
+- [ ] Drag the app into Applications and launch it
+- [ ] Run one check with a known local or disposable endpoint
+- [ ] Export one JSON report
+- [ ] Export one HTML report
+- [ ] Confirm API keys are kept in memory only and are not persisted
+- [ ] Confirm the build is unsigned / ad-hoc unless Developer ID signing and
+      notarization are explicitly enabled for the release
 
 ## CLI Smoke
 
@@ -43,7 +63,7 @@ Use this checklist for AI Ping v1.0 and later 1.x releases.
 - [ ] Confirm combined output keeps stdout as pure JSON
 - [ ] Confirm report `version` matches the package version
 - [ ] Confirm report has stable top-level fields: `version`, `profile`,
-      `baseUrl`, `model`, `startedAt`, `durationMs`, `summary`, `results`
+      `endpoint`, `model`, `startedAt`, `durationMs`, `summary`, `results`
 - [ ] Confirm report `summary` has `passed`, `warned`, `failed`, `skipped`,
       `total`, `requiredFailed`, `ok`
 - [ ] Confirm result entries have `id`, `title`, `status`, `severity`,
@@ -57,6 +77,8 @@ Use this checklist for AI Ping v1.0 and later 1.x releases.
       `package.json`, `LICENSE`
 - [ ] `@starroy/ai-ping` package includes `dist`, `README.md`, `package.json`,
       `LICENSE`
+- [ ] `@starroy/ai-ping` package does not require installing private
+      `@starroy/ai-ping-report`
 - [ ] Packages do not include `src`, `tests`, `docs/design`, `node_modules`,
       private endpoints, or API keys
 

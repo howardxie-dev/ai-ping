@@ -28,6 +28,26 @@ npm install -g @starroy/ai-ping
 The CLI package is `@starroy/ai-ping`; the command is `aiping`. The reusable
 core library is `@starroy/ai-ping-core`.
 
+## Desktop Preview
+
+AI Ping v1.1 adds a macOS-first Desktop Preview built with Tauri. It provides a
+local UI for choosing a profile, entering a base URL, model, API key, and
+timeout, running checks, inspecting results, and exporting JSON or HTML reports.
+
+```bash
+pnpm install
+pnpm desktop:dev
+pnpm desktop:build:dmg
+```
+
+The Desktop Preview does not replace the CLI, does not save API keys, and does
+not add new checks or profiles. Windows and Linux packaging, notarization,
+automatic updates, saved settings, and history are planned for later releases.
+
+The local DMG build is unsigned / ad-hoc and is intended for local preview
+validation. See [apps/desktop/README.md](apps/desktop/README.md) for packaging
+commands, smoke checks, and preview limitations.
+
 ## Quick Start
 
 ```bash
@@ -68,7 +88,7 @@ proxies, gateways, and Ollama's OpenAI-compatible `/v1/chat/completions`.
 
 Use `openai-responses` for endpoints that implement OpenAI-compatible
 `POST /responses` with Responses-style `input`, `output`, `output_text`, and
-semantic streaming events. v1.0 does not check Responses tools, built-in tools,
+semantic streaming events. AI Ping 1.x does not yet check Responses tools, built-in tools,
 multimodal input, or conversation state.
 
 Use `ollama` for Ollama native `/api/tags`, `/api/generate`, and `/api/chat`.
@@ -80,7 +100,7 @@ OpenAI compatibility are separate APIs.
 
 Use `anthropic` for Anthropic Claude Messages API under a base URL such as
 `https://api.anthropic.com/v1`. Bedrock Anthropic, Vertex AI Anthropic, tool
-use, extended thinking, and computer use are outside the v1.0 profile.
+use, extended thinking, and computer use are outside the current 1.x profile.
 
 ## Reports
 
@@ -94,7 +114,7 @@ AI Ping produces three report forms:
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
+  --model gpt-5.5 \
   --json
 ```
 
@@ -102,7 +122,7 @@ aiping check \
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
+  --model gpt-5.5 \
   --html reports/aiping.html
 ```
 
@@ -156,7 +176,7 @@ Limit or skip checks with comma-separated check IDs:
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
+  --model gpt-5.5 \
   --only openai-chat.chat.basic,openai-chat.chat.stream
 ```
 
@@ -225,7 +245,7 @@ const report = await runChecks({
   profile: "openai-chat",
   baseUrl: "http://localhost:3000/v1",
   apiKey: "sk-test",
-  model: "gpt-4o-mini",
+  model: "gpt-5.5",
 });
 
 console.log(report.summary.ok);
@@ -242,6 +262,7 @@ pnpm install
 pnpm test
 pnpm typecheck
 pnpm build
+pnpm desktop:dev
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development and pull request

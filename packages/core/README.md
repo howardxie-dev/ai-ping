@@ -89,7 +89,7 @@ const report = await runChecks({
   profile: "openai-chat",
   baseUrl: "http://localhost:3000/v1",
   apiKey: "sk-test",
-  model: "gpt-4o-mini",
+  model: "gpt-5.5",
 });
 ```
 

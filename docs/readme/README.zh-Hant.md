@@ -26,6 +26,24 @@ npm install -g @starroy/ai-ping
 CLI 套件名稱是 `@starroy/ai-ping`，命令名稱是 `aiping`。可重用 Core
 函式庫套件名稱是 `@starroy/ai-ping-core`。
 
+## Desktop Preview
+
+AI Ping v1.1 新增 macOS-first 的 Tauri Desktop Preview。它提供本機 UI，用於選擇
+profile、填寫 base URL、model、API key 和 timeout，執行 checks，查看結果，並匯出
+JSON 或 HTML report。
+
+```bash
+pnpm install
+pnpm desktop:dev
+pnpm desktop:build:dmg
+```
+
+Desktop Preview 不取代 CLI，不保存 API key，也不新增 checks 或 profiles。Windows /
+Linux 打包、notarization、自動更新、保存設定和歷史記錄會放到後續版本。
+
+本機 DMG 建置是 unsigned / ad-hoc，僅用於本機預覽驗證。打包命令、smoke checks
+和預覽限制詳見 [apps/desktop/README.md](../../apps/desktop/README.md)。
+
 ## 快速開始
 
 ```bash
@@ -65,7 +83,7 @@ Chat Completions 相容 endpoint 使用 `openai-chat`，包括本機 proxy、gat
 
 實作 OpenAI-compatible `POST /responses` 的 endpoint 使用
 `openai-responses`。它檢查 Responses 風格的 `input`、`output`、
-`output_text` 和 semantic streaming events。v1.0 不檢查 Responses tools、
+`output_text` 和 semantic streaming events。AI Ping 1.x 暫不檢查 Responses tools、
 built-in tools、multimodal input 或 conversation state。
 
 Ollama native `/api/tags`、`/api/generate` 和 `/api/chat` 使用 `ollama`。
@@ -77,7 +95,7 @@ OpenAI compatibility 是不同 API。
 
 Anthropic Claude Messages API 使用 `anthropic`，base URL 範例為
 `https://api.anthropic.com/v1`。Bedrock Anthropic、Vertex AI Anthropic、tool
-use、extended thinking 和 computer use 不屬於 v1.0 profile 範圍。
+use、extended thinking 和 computer use 不屬於目前 1.x profile 範圍。
 
 ## 報告
 
@@ -91,7 +109,7 @@ AI Ping 支援三種報告形態：
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
+  --model gpt-5.5 \
   --json
 ```
 
@@ -99,7 +117,7 @@ aiping check \
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
+  --model gpt-5.5 \
   --html reports/aiping.html
 ```
 
@@ -150,7 +168,7 @@ aiping checks --profile openai-chat
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
+  --model gpt-5.5 \
   --only openai-chat.chat.basic,openai-chat.chat.stream
 ```
 
@@ -216,7 +234,7 @@ const report = await runChecks({
   profile: "openai-chat",
   baseUrl: "http://localhost:3000/v1",
   apiKey: "sk-test",
-  model: "gpt-4o-mini",
+  model: "gpt-5.5",
 });
 
 console.log(report.summary.ok);
@@ -232,6 +250,7 @@ pnpm install
 pnpm test
 pnpm typecheck
 pnpm build
+pnpm desktop:dev
 ```
 
 貢獻指南見 [CONTRIBUTING.md](../../CONTRIBUTING.md)。

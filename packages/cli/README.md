@@ -23,7 +23,7 @@ The OpenAI-compatible Responses profile is `openai-responses`. It sends
 Responses-style `input` requests to `POST /responses` and validates `output`,
 `output_text`, and semantic streaming events such as
 `response.output_text.delta`. It does not check Responses tools, built-in tools,
-multimodal input, or conversation state in v0.10.
+multimodal input, or conversation state in the current 1.x line.
 
 ## Usage
 
@@ -31,7 +31,7 @@ multimodal input, or conversation state in v0.10.
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini
+  --model gpt-5.5
 ```
 
 Check modern OpenAI-compatible tool calls only:
@@ -40,7 +40,7 @@ Check modern OpenAI-compatible tool calls only:
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
+  --model gpt-5.5 \
   --only openai-chat.tool_calls.basic,openai-chat.tool_calls.stream
 ```
 
@@ -130,7 +130,7 @@ Use JSON output for issue reports or CI artifacts:
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
+  --model gpt-5.5 \
   --json
 ```
 
@@ -140,7 +140,7 @@ Write a static HTML report for sharing, screenshots, or CI artifacts:
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
+  --model gpt-5.5 \
   --html reports/aiping.html
 ```
 

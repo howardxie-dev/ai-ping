@@ -11,7 +11,7 @@ Console output is the default:
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini
+  --model gpt-5.5
 ```
 
 Use it when a person is reading the result in a terminal. The console report is
@@ -25,7 +25,7 @@ Use `--json` for automation, issue reports, and CI processing:
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
+  --model gpt-5.5 \
   --json > aiping-report.json
 ```
 
@@ -81,7 +81,7 @@ Use `--html <file>` to write a static report:
 aiping check \
   --profile openai-chat \
   --base-url http://localhost:3000/v1 \
-  --model gpt-4o-mini \
+  --model gpt-5.5 \
   --html reports/aiping.html
 ```
 

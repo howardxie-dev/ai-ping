@@ -1,6 +1,6 @@
 {
   "name": "@starroy/ai-ping",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Quick protocol checks for AI and LLM API endpoints.",
   "license": "MIT",
   "type": "module",
@@ -38,18 +38,19 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --clean",
+    "build": "tsup",
     "cli": "node dist/index.js",
     "pack:check": "pnpm build && npm_config_cache=../../.npm-pack-cache npm pack --dry-run",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@starroy/ai-ping-core": "1.0.0",
+    "@starroy/ai-ping-core": "1.1.0",
     "cac": "^6.7.14",
     "picocolors": "^1.1.1"
   },
   "devDependencies": {
+    "@starroy/ai-ping-report": "workspace:*",
     "@types/node": "^24.10.1",
     "tsup": "^8.5.0",
     "vitest": "^4.0.15"

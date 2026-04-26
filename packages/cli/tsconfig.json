@@ -6,7 +6,8 @@
     "types": ["node", "vitest/globals"],
     "baseUrl": ".",
     "paths": {
-      "@starroy/ai-ping-core": ["../core/src/index.ts"]
+      "@starroy/ai-ping-core": ["../core/src/index.ts"],
+      "@starroy/ai-ping-report": ["../report/src/index.ts"]
     }
   },
   "include": ["src", "tests"]
