@@ -30,7 +30,7 @@ core library is `@starroy/ai-ping-core`.
 
 ## Desktop Preview
 
-AI Ping v1.1 adds a macOS-first Desktop Preview built with Tauri. It provides a
+AI Ping v1.2 includes a macOS-first Desktop Preview built with Tauri. It provides a
 local UI for choosing a profile, entering a base URL, model, API key, and
 timeout, running checks, inspecting results, and exporting JSON or HTML reports.
 
@@ -40,9 +40,10 @@ pnpm desktop:dev
 pnpm desktop:build:dmg
 ```
 
-The Desktop Preview does not replace the CLI, does not save API keys, and does
-not add new checks or profiles. Windows and Linux packaging, notarization,
-automatic updates, saved settings, and history are planned for later releases.
+The Desktop Preview does not replace the CLI and does not add new checks or
+profiles. It may save non-sensitive desktop configuration, but API keys are kept
+in memory only and are not saved. Windows and Linux packaging, notarization, and
+automatic updates are planned for later releases.
 
 The local DMG build is unsigned / ad-hoc and is intended for local preview
 validation. See [apps/desktop/README.md](apps/desktop/README.md) for packaging

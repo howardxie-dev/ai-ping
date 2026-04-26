@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.0
+
+### Added
+
+- Added Desktop Preview persistence for non-sensitive desktop configuration
+  while keeping API keys in memory only.
+
+### Changed
+
+- Updated the release checklist with v1.2 Desktop Preview persistence smoke
+  checks.
+
+### Notes
+
+- Desktop Preview persistence is limited to non-sensitive desktop state and
+  does not save run records or API keys.
+- Core and CLI behavior remain unchanged.
+
 ## 1.1.0
 
 ### Added

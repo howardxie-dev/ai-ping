@@ -200,6 +200,10 @@ select:focus {
   overflow-wrap: anywhere;
 }
 
+.persistence-hint {
+  margin: -4px 0 0;
+}
+
 .results {
   padding: 24px 24px 24px 28px;
   overflow: auto;

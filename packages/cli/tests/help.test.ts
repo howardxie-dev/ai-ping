@@ -47,6 +47,6 @@ describe("CLI help stability", () => {
   it("prints the v1 CLI version", async () => {
     const output = await helpOutput(["--version"]);
 
-    expect(output).toContain("aiping/1.1.0");
+    expect(output).toContain("aiping/1.2.0");
   });
 });
