@@ -7,6 +7,12 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "noEmit": true,
+    "rootDir": "../..",
+    "baseUrl": ".",
+    "paths": {
+      "@starroy/ai-ping-core": ["../../packages/core/src/index.ts"],
+      "@starroy/ai-ping-report": ["../../packages/report/src/index.ts"]
+    },
     "resolveJsonModule": true,
     "types": ["vite/client"]
   },
