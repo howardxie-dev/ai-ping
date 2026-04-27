@@ -1,0 +1,437 @@
+export const supportedLocales = ["en", "zh-Hans", "zh-Hant"] as const;
+
+export type Locale = (typeof supportedLocales)[number];
+
+export const defaultLocale: Locale = "en";
+
+const en = {
+  app: {
+    name: "AI Ping",
+    preview: "Desktop Preview",
+    title: "AI Ping Desktop Preview",
+  },
+  language: {
+    label: "Language",
+    english: "English",
+    simplifiedChinese: "Simplified Chinese",
+    traditionalChinese: "Traditional Chinese",
+  },
+  configuration: {
+    ariaLabel: "Run configuration",
+    title: "Configuration",
+    profile: "Profile",
+    baseUrl: "Base URL",
+    model: "Model",
+    apiKey: "API Key",
+    timeout: "Timeout",
+    seconds: "seconds",
+    apiKeyNote: "API keys are kept in memory and are not saved.",
+    chooseProfile: "Choose a protocol profile.",
+  },
+  actions: {
+    runCheck: "Run Check",
+    running: "Running...",
+    exportJson: "Export JSON",
+    exportHtml: "Export HTML",
+    clear: "Clear",
+    copyJson: "Copy JSON",
+    copyDetails: "Copy details",
+  },
+  profile: {
+    label: {
+      "openai-chat": "OpenAI Chat",
+      "openai-responses": "OpenAI Responses",
+      ollama: "Ollama",
+      anthropic: "Anthropic",
+      gemini: "Gemini",
+    },
+    description: {
+      "openai-chat": "For OpenAI-compatible /chat/completions endpoints.",
+      "openai-responses": "For OpenAI-compatible /responses endpoints.",
+      ollama: "For local Ollama native APIs.",
+      anthropic: "For Anthropic Claude Messages API endpoints.",
+      gemini: "For Gemini Developer API REST endpoints.",
+    },
+    apiKeyPlaceholder: {
+      required: "Required by most hosted APIs",
+      optional: "Optional",
+    },
+  },
+  status: {
+    ok: "OK",
+    needsAttention: "Needs attention",
+    failed: "Failed",
+    ready: "Ready to check",
+    running: "Running checks",
+    runFailed: "Run failed",
+    pass: "Passed",
+    warn: "Warned",
+    fail: "Failed",
+    skip: "Skipped",
+    warning: "Warning",
+  },
+  result: {
+    ariaLabel: "Check results",
+    summary: "Summary",
+    passed: "Passed",
+    warned: "Warned",
+    failed: "Failed",
+    skipped: "Skipped",
+    duration: "Duration",
+    allRequiredPassed: "All required checks passed.",
+    recommendedNeedAttention:
+      "Required checks passed, but some recommended compatibility checks need attention.",
+    requiredFailed: "One or more required checks failed.",
+    requiredFailedReview:
+      "One or more required checks failed. Review the top issues before using this endpoint.",
+    runningBody: "AI Ping is checking the selected endpoint protocol behavior.",
+    readyBody: "Choose a profile, enter endpoint details, and run protocol checks.",
+    reviewLatestRun: "Review the latest run below.",
+    allChecksPassed: "Required and recommended checks passed for this profile.",
+    usableWithWarnings:
+      "Basic required checks are usable. Review recommended compatibility warnings before shipping.",
+    usable: "Basic and recommended compatibility checks are usable.",
+  },
+  issues: {
+    title: "Top issues",
+    basicUsable: "Basic checks are usable.",
+    noneFound: "No issues found.",
+    noneFoundInRun: "No protocol issues found in this run.",
+    empty: "Run a check to see compatibility issues ranked by impact.",
+  },
+  advanced: {
+    show: "Show advanced details",
+    title: "Advanced details",
+    help: "Check IDs, durations, categories, details JSON, and raw report.",
+    rawReport: "Raw report",
+    details: "Details",
+    selectedCheck: "Selected check",
+    selectCheck: "Select a check to inspect details.",
+    empty: "Advanced details will appear after a run.",
+    status: "Status",
+    check: "Check",
+    result: "Result",
+    duration: "Duration",
+    titleField: "Title",
+    severity: "Severity",
+    category: "Category",
+    message: "Message",
+  },
+  validation: {
+    chooseProfile: "Choose a profile.",
+    validBaseUrl: "Enter a valid absolute URL.",
+    enterModel: "Enter a model.",
+    timeoutMin: "Use at least 1000 ms.",
+  },
+  feedback: {
+    copied: "Copied to clipboard.",
+    clipboardUnavailable: "Clipboard access is unavailable in this environment.",
+    savedReport: "Saved {kind} report to {path}",
+    noReportYet: "No report yet",
+    runCheckToSeeResults: "Run a check to see results.",
+    runBeforeExporting: "Run a check before exporting reports.",
+    exportCanceled: "Export canceled.",
+    exportDesktopOnly:
+      "Export is available in the Tauri desktop app, not in browser preview.",
+    exportFailed: "Desktop export failed.",
+  },
+  severity: {
+    required: "Required",
+    recommended: "Recommended",
+    optional: "Optional",
+  },
+} as const;
+
+type WidenStrings<Value> = Value extends string
+  ? string
+  : {
+      readonly [Key in keyof Value]: WidenStrings<Value[Key]>;
+    };
+
+export type LocaleMessages = WidenStrings<typeof en>;
+
+const zhHans = {
+  app: {
+    name: "AI Ping",
+    preview: "桌面预览版",
+    title: "AI Ping 桌面预览版",
+  },
+  language: {
+    label: "语言",
+    english: "English",
+    simplifiedChinese: "简体中文",
+    traditionalChinese: "繁體中文",
+  },
+  configuration: {
+    ariaLabel: "运行配置",
+    title: "配置",
+    profile: "协议类型",
+    baseUrl: "Base URL",
+    model: "模型",
+    apiKey: "API Key",
+    timeout: "超时时间",
+    seconds: "秒",
+    apiKeyNote: "API Key 仅保存在内存中，不会被保存。",
+    chooseProfile: "选择协议类型。",
+  },
+  actions: {
+    runCheck: "运行检查",
+    running: "正在运行...",
+    exportJson: "导出 JSON",
+    exportHtml: "导出 HTML",
+    clear: "清空",
+    copyJson: "复制 JSON",
+    copyDetails: "复制详情",
+  },
+  profile: {
+    label: {
+      "openai-chat": "OpenAI Chat",
+      "openai-responses": "OpenAI Responses",
+      ollama: "Ollama",
+      anthropic: "Anthropic",
+      gemini: "Gemini",
+    },
+    description: {
+      "openai-chat": "用于 OpenAI-compatible /chat/completions endpoint。",
+      "openai-responses": "用于 OpenAI-compatible /responses endpoint。",
+      ollama: "用于本地 Ollama native API。",
+      anthropic: "用于 Anthropic Claude Messages API endpoint。",
+      gemini: "用于 Gemini Developer API REST endpoint。",
+    },
+    apiKeyPlaceholder: {
+      required: "大多数托管 API 需要",
+      optional: "可选",
+    },
+  },
+  status: {
+    ok: "可用",
+    needsAttention: "需要注意",
+    failed: "检查失败",
+    ready: "准备检查",
+    running: "正在运行检查",
+    runFailed: "运行失败",
+    pass: "已通过",
+    warn: "有警告",
+    fail: "失败",
+    skip: "已跳过",
+    warning: "警告",
+  },
+  result: {
+    ariaLabel: "检查结果",
+    summary: "摘要",
+    passed: "已通过",
+    warned: "警告",
+    failed: "失败",
+    skipped: "已跳过",
+    duration: "耗时",
+    allRequiredPassed: "所有必需检查均已通过。",
+    recommendedNeedAttention: "核心功能可用，但有一些推荐兼容性检查需要注意。",
+    requiredFailed: "一个或多个必需检查失败。",
+    requiredFailedReview: "一个或多个必需检查失败。使用此 endpoint 前请查看主要问题。",
+    runningBody: "AI Ping 正在检查所选 endpoint 的协议行为。",
+    readyBody: "选择协议类型，输入 endpoint 信息，然后运行协议检查。",
+    reviewLatestRun: "查看下方最近一次运行结果。",
+    allChecksPassed: "此协议类型的必需和推荐检查均已通过。",
+    usableWithWarnings: "基础必需检查可用。发布前请查看推荐兼容性警告。",
+    usable: "基础和推荐兼容性检查均可用。",
+  },
+  issues: {
+    title: "主要问题",
+    basicUsable: "基础检查可用。",
+    noneFound: "未发现问题。",
+    noneFoundInRun: "本次运行未发现协议问题。",
+    empty: "运行检查后查看按影响排序的兼容性问题。",
+  },
+  advanced: {
+    show: "显示高级详情",
+    title: "高级详情",
+    help: "包含 Check ID、耗时、分类、details JSON 和原始报告。",
+    rawReport: "原始报告",
+    details: "详情",
+    selectedCheck: "选中的检查",
+    selectCheck: "选择一个检查以查看详情。",
+    empty: "运行后将显示高级详情。",
+    status: "状态",
+    check: "检查",
+    result: "结果",
+    duration: "耗时",
+    titleField: "标题",
+    severity: "严重性",
+    category: "分类",
+    message: "消息",
+  },
+  validation: {
+    chooseProfile: "请选择协议类型。",
+    validBaseUrl: "请输入有效的绝对 URL。",
+    enterModel: "请输入模型。",
+    timeoutMin: "请至少使用 1000 毫秒。",
+  },
+  feedback: {
+    copied: "已复制到剪贴板。",
+    clipboardUnavailable: "当前环境无法访问剪贴板。",
+    savedReport: "{kind} 报告已保存到 {path}",
+    noReportYet: "暂无报告",
+    runCheckToSeeResults: "运行检查后查看结果。",
+    runBeforeExporting: "请先运行检查再导出报告。",
+    exportCanceled: "已取消导出。",
+    exportDesktopOnly: "导出功能仅在 Tauri 桌面应用中可用，浏览器预览不可用。",
+    exportFailed: "桌面导出失败。",
+  },
+  severity: {
+    required: "必需",
+    recommended: "推荐",
+    optional: "可选",
+  },
+} satisfies LocaleMessages;
+
+const zhHant = {
+  app: {
+    name: "AI Ping",
+    preview: "桌面預覽版",
+    title: "AI Ping 桌面預覽版",
+  },
+  language: {
+    label: "語言",
+    english: "English",
+    simplifiedChinese: "简体中文",
+    traditionalChinese: "繁體中文",
+  },
+  configuration: {
+    ariaLabel: "執行設定",
+    title: "設定",
+    profile: "協議類型",
+    baseUrl: "Base URL",
+    model: "模型",
+    apiKey: "API Key",
+    timeout: "逾時時間",
+    seconds: "秒",
+    apiKeyNote: "API Key 僅保存在記憶體中，不會被儲存。",
+    chooseProfile: "選擇協議類型。",
+  },
+  actions: {
+    runCheck: "執行檢查",
+    running: "正在執行...",
+    exportJson: "匯出 JSON",
+    exportHtml: "匯出 HTML",
+    clear: "清除",
+    copyJson: "複製 JSON",
+    copyDetails: "複製詳情",
+  },
+  profile: {
+    label: {
+      "openai-chat": "OpenAI Chat",
+      "openai-responses": "OpenAI Responses",
+      ollama: "Ollama",
+      anthropic: "Anthropic",
+      gemini: "Gemini",
+    },
+    description: {
+      "openai-chat": "用於 OpenAI-compatible /chat/completions endpoint。",
+      "openai-responses": "用於 OpenAI-compatible /responses endpoint。",
+      ollama: "用於本機 Ollama native API。",
+      anthropic: "用於 Anthropic Claude Messages API endpoint。",
+      gemini: "用於 Gemini Developer API REST endpoint。",
+    },
+    apiKeyPlaceholder: {
+      required: "大多數託管 API 需要",
+      optional: "選填",
+    },
+  },
+  status: {
+    ok: "可用",
+    needsAttention: "需要注意",
+    failed: "檢查失敗",
+    ready: "準備檢查",
+    running: "正在執行檢查",
+    runFailed: "執行失敗",
+    pass: "已通過",
+    warn: "有警告",
+    fail: "失敗",
+    skip: "已略過",
+    warning: "警告",
+  },
+  result: {
+    ariaLabel: "檢查結果",
+    summary: "摘要",
+    passed: "已通過",
+    warned: "警告",
+    failed: "失敗",
+    skipped: "已略過",
+    duration: "耗時",
+    allRequiredPassed: "所有必需檢查皆已通過。",
+    recommendedNeedAttention: "核心功能可用，但有一些建議相容性檢查需要注意。",
+    requiredFailed: "一個或多個必需檢查失敗。",
+    requiredFailedReview: "一個或多個必需檢查失敗。使用此 endpoint 前請查看主要問題。",
+    runningBody: "AI Ping 正在檢查所選 endpoint 的協議行為。",
+    readyBody: "選擇協議類型，輸入 endpoint 資訊，然後執行協議檢查。",
+    reviewLatestRun: "查看下方最近一次執行結果。",
+    allChecksPassed: "此協議類型的必需和建議檢查皆已通過。",
+    usableWithWarnings: "基礎必需檢查可用。發布前請查看建議相容性警告。",
+    usable: "基礎和建議相容性檢查皆可用。",
+  },
+  issues: {
+    title: "主要問題",
+    basicUsable: "基礎檢查可用。",
+    noneFound: "未發現問題。",
+    noneFoundInRun: "本次執行未發現協議問題。",
+    empty: "執行檢查後查看按影響排序的相容性問題。",
+  },
+  advanced: {
+    show: "顯示進階詳情",
+    title: "進階詳情",
+    help: "包含 Check ID、耗時、分類、details JSON 和原始報告。",
+    rawReport: "原始報告",
+    details: "詳情",
+    selectedCheck: "選中的檢查",
+    selectCheck: "選擇一個檢查以查看詳情。",
+    empty: "執行後將顯示進階詳情。",
+    status: "狀態",
+    check: "檢查",
+    result: "結果",
+    duration: "耗時",
+    titleField: "標題",
+    severity: "嚴重性",
+    category: "分類",
+    message: "訊息",
+  },
+  validation: {
+    chooseProfile: "請選擇協議類型。",
+    validBaseUrl: "請輸入有效的絕對 URL。",
+    enterModel: "請輸入模型。",
+    timeoutMin: "請至少使用 1000 毫秒。",
+  },
+  feedback: {
+    copied: "已複製到剪貼簿。",
+    clipboardUnavailable: "目前環境無法存取剪貼簿。",
+    savedReport: "{kind} 報告已儲存到 {path}",
+    noReportYet: "尚無報告",
+    runCheckToSeeResults: "執行檢查後查看結果。",
+    runBeforeExporting: "請先執行檢查再匯出報告。",
+    exportCanceled: "已取消匯出。",
+    exportDesktopOnly: "匯出功能僅在 Tauri 桌面應用中可用，瀏覽器預覽不可用。",
+    exportFailed: "桌面匯出失敗。",
+  },
+  severity: {
+    required: "必需",
+    recommended: "建議",
+    optional: "選填",
+  },
+} satisfies LocaleMessages;
+
+export const locales = {
+  en,
+  "zh-Hans": zhHans,
+  "zh-Hant": zhHant,
+} satisfies Record<Locale, LocaleMessages>;
+
+type Join<Prefix extends string, Key extends string> = Prefix extends ""
+  ? Key
+  : `${Prefix}.${Key}`;
+
+type LeafPaths<Value, Prefix extends string = ""> = Value extends string
+  ? Prefix
+  : {
+      [Key in keyof Value & string]: LeafPaths<Value[Key], Join<Prefix, Key>>;
+    }[keyof Value & string];
+
+export type I18nKey = LeafPaths<LocaleMessages>;

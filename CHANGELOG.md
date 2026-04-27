@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.0
+
+### Added
+
+- Added Desktop UI internationalization for English, Simplified Chinese, and
+  Traditional Chinese.
+- Added system-locale detection and an in-app language switch that updates the
+  Desktop UI immediately without saving language preferences.
+- Added localized Desktop profile labels, profile descriptions, configuration
+  text, result summaries, top issues, advanced details, export actions, empty
+  states, and API key safety copy.
+
+### Notes
+
+- CLI output, JSON report fields, HTML reports, protocol IDs, check IDs, model
+  names, base URLs, and raw details JSON keys remain untranslated.
+- Core and CLI behavior are unchanged.
+
 ## 1.1.0
 
 ### Added

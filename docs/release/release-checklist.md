@@ -18,16 +18,23 @@ Use this checklist for AI Ping v1.0 and later 1.x releases.
 - [ ] `pnpm typecheck`
 - [ ] `pnpm build`
 - [ ] `pnpm pack:check`
-- [ ] For v1.1 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop test`
-- [ ] For v1.1 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop typecheck`
-- [ ] For v1.1 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop build`
-- [ ] For v1.1 Desktop Preview: `pnpm desktop:build:app`
-- [ ] For v1.1 Desktop Preview: `pnpm desktop:build:dmg`
+- [ ] For v1.2 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop test`
+- [ ] For v1.2 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop typecheck`
+- [ ] For v1.2 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop build`
+- [ ] For v1.2 Desktop Preview: `pnpm desktop:build:app`
+- [ ] For v1.2 Desktop Preview: `pnpm desktop:build:dmg`
 
 ## Desktop Preview Smoke
 
 - [ ] Open `AI Ping Desktop Preview.app`
 - [ ] Confirm the app title is `AI Ping Desktop Preview`
+- [ ] Confirm the Desktop UI starts in the expected language for `en`,
+      `zh-Hans`, and `zh-Hant` system locale inputs
+- [ ] Switch between `English`, `简体中文`, and `繁體中文` and confirm visible UI
+      text updates immediately
+- [ ] Confirm language preferences are not persisted after relaunch
+- [ ] Confirm CLI output, JSON reports, HTML reports, protocol IDs, check IDs,
+      model names, base URLs, and raw details JSON keys remain untranslated
 - [ ] Confirm the app icon renders in Finder and Dock
 - [ ] Open the DMG and confirm the background image renders
 - [ ] Confirm the DMG contains `AI Ping Desktop Preview.app` and `Applications`

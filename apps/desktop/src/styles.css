@@ -56,6 +56,19 @@ button:disabled {
   letter-spacing: 0;
 }
 
+.configuration-heading {
+  display: grid;
+  gap: 10px;
+}
+
+.language-switcher {
+  gap: 5px;
+}
+
+.language-switcher select {
+  min-height: 32px;
+}
+
 label {
   display: grid;
   gap: 6px;

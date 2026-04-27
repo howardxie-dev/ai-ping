@@ -6,10 +6,12 @@ import type {
 } from "@starroy/ai-ping-core";
 import { useMemo, useState } from "react";
 import { exportReport, formatJsonReport } from "./lib/export-report";
+import { detectSystemLocale, t } from "./lib/i18n";
 import {
   getProfileDefaults,
   getProfileDescription,
   getProfileLabel,
+  type DesktopLocale,
 } from "./lib/profile-metadata";
 import { validateRunForm } from "./lib/validation";
 
@@ -19,8 +21,14 @@ type AttentionLevel = "idle" | "running" | "ok" | "attention" | "failed";
 const profiles = listProfiles();
 const initialProfile = profiles[0]?.id ?? "";
 const initialDefaults = getProfileDefaults(initialProfile);
+const localeLabels: Record<DesktopLocale, string> = {
+  en: "English",
+  "zh-Hans": "简体中文",
+  "zh-Hant": "繁體中文",
+};
 
 export function App() {
+  const [locale, setLocale] = useState<DesktopLocale>(() => detectSystemLocale());
   const [profile, setProfile] = useState(initialProfile);
   const [baseUrl, setBaseUrl] = useState(initialDefaults.baseUrl);
   const [model, setModel] = useState(initialDefaults.model);
@@ -91,7 +99,7 @@ export function App() {
     setMessage(null);
     try {
       const path = await exportReport(report, kind);
-      setMessage(`Saved ${kind.toUpperCase()} report to ${path}`);
+      setMessage(t(locale, "feedback.savedReport", { kind: kind.toUpperCase(), path }));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     }
@@ -111,62 +119,84 @@ export function App() {
     setMessage(null);
     try {
       await navigator.clipboard.writeText(text);
-      setMessage("Copied to clipboard.");
+      setMessage(t(locale, "feedback.copied"));
     } catch {
-      setMessage("Clipboard access is unavailable in this environment.");
+      setMessage(t(locale, "feedback.clipboardUnavailable"));
     }
   }
 
   return (
     <main className="app-shell">
-      <aside className="configuration" aria-label="Run configuration">
-        <h2>Configuration</h2>
+      <aside className="configuration" aria-label={t(locale, "configuration.ariaLabel")}>
+        <div className="configuration-heading">
+          <h2>{t(locale, "configuration.title")}</h2>
+          <label className="language-switcher">
+            <span>{t(locale, "language.label")}</span>
+            <select
+              aria-label={t(locale, "language.label")}
+              value={locale}
+              onChange={(event) => setLocale(event.target.value as DesktopLocale)}
+            >
+              {Object.entries(localeLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
 
         <label>
-          <span>Profile</span>
+          <span>{t(locale, "configuration.profile")}</span>
           <select
             value={profile}
             onChange={(event) => handleProfileChange(event.target.value)}
           >
             {profiles.map((item) => (
               <option key={item.id} value={item.id}>
-                {getProfileLabel(item)}
+                {getProfileLabel(item, locale)}
               </option>
             ))}
           </select>
           <small className="hint">
             {selectedProfile
-              ? getProfileDescription(selectedProfile.id)
-              : "Choose a protocol profile."}
+              ? getProfileDescription(selectedProfile.id, locale)
+              : t(locale, "configuration.chooseProfile")}
           </small>
-          {errors.profile ? <small className="error">{errors.profile}</small> : null}
+          {errors.profile ? (
+            <small className="error">{t(locale, "validation.chooseProfile")}</small>
+          ) : null}
         </label>
 
         <label>
-          <span>Base URL</span>
+          <span>{t(locale, "configuration.baseUrl")}</span>
           <input value={baseUrl} onChange={(event) => setBaseUrl(event.target.value)} />
-          {errors.baseUrl ? <small className="error">{errors.baseUrl}</small> : null}
+          {errors.baseUrl ? (
+            <small className="error">{t(locale, "validation.validBaseUrl")}</small>
+          ) : null}
         </label>
 
         <label>
-          <span>Model</span>
+          <span>{t(locale, "configuration.model")}</span>
           <input value={model} onChange={(event) => setModel(event.target.value)} />
-          {errors.model ? <small className="error">{errors.model}</small> : null}
+          {errors.model ? (
+            <small className="error">{t(locale, "validation.enterModel")}</small>
+          ) : null}
         </label>
 
         <label>
-          <span>API Key</span>
+          <span>{t(locale, "configuration.apiKey")}</span>
           <div className="secret-field">
             <input
               value={apiKey}
               onChange={(event) => setApiKey(event.target.value)}
-              placeholder={apiKeyPlaceholder(selectedProfile)}
+              placeholder={apiKeyPlaceholder(selectedProfile, locale)}
               type="password"
               autoComplete="off"
               spellCheck={false}
             />
             <button
-              aria-label="Clear API key"
+              aria-label={t(locale, "actions.clear")}
               disabled={!apiKey}
               onClick={() => setApiKey("")}
               type="button"
@@ -174,11 +204,11 @@ export function App() {
               x
             </button>
           </div>
-          <small className="hint">API keys are kept in memory and are not saved.</small>
+          <small className="hint">{t(locale, "configuration.apiKeyNote")}</small>
         </label>
 
         <label>
-          <span>Timeout</span>
+          <span>{t(locale, "configuration.timeout")}</span>
           <div className="timeout-field">
             <input
               value={timeoutSeconds}
@@ -187,9 +217,11 @@ export function App() {
               type="number"
               onChange={(event) => setTimeoutSeconds(Number(event.target.value))}
             />
-            <span>seconds</span>
+            <span>{t(locale, "configuration.seconds")}</span>
           </div>
-          {errors.timeoutMs ? <small className="error">{errors.timeoutMs}</small> : null}
+          {errors.timeoutMs ? (
+            <small className="error">{t(locale, "validation.timeoutMin")}</small>
+          ) : null}
         </label>
 
         <div className="side-actions">
@@ -200,45 +232,46 @@ export function App() {
             type="button"
           >
             <span aria-hidden="true" className="play-mark" />
-            {runState === "running" ? "Running..." : "Run Check"}
+            {runState === "running" ? t(locale, "actions.running") : t(locale, "actions.runCheck")}
           </button>
           <button disabled={!report} onClick={() => handleExport("json")} type="button">
-            Export JSON
+            {t(locale, "actions.exportJson")}
           </button>
           <button disabled={!report} onClick={() => handleExport("html")} type="button">
-            Export HTML
+            {t(locale, "actions.exportHtml")}
           </button>
         </div>
 
         {message ? <p className="message">{message}</p> : null}
       </aside>
 
-      <section className="results" aria-label="Check results">
+      <section className="results" aria-label={t(locale, "result.ariaLabel")}>
         <header className="app-title">
-          <h1>AI Ping Desktop Preview</h1>
+          <h1>{t(locale, "app.title")}</h1>
         </header>
 
         <StatusBanner
           attention={attention}
+          locale={locale}
           message={message}
           report={report}
           runState={runState}
         />
 
-        <section className="summary-strip" aria-label="Summary">
-          <SummaryCard label="Passed" tone="pass" value={report?.summary.passed ?? 0} />
-          <SummaryCard label="Warned" tone="warn" value={report?.summary.warned ?? 0} />
-          <SummaryCard label="Failed" tone="fail" value={report?.summary.failed ?? 0} />
-          <SummaryCard label="Skipped" tone="skip" value={report?.summary.skipped ?? 0} />
+        <section className="summary-strip" aria-label={t(locale, "result.summary")}>
+          <SummaryCard label={t(locale, "result.passed")} tone="pass" value={report?.summary.passed ?? 0} />
+          <SummaryCard label={t(locale, "result.warned")} tone="warn" value={report?.summary.warned ?? 0} />
+          <SummaryCard label={t(locale, "result.failed")} tone="fail" value={report?.summary.failed ?? 0} />
+          <SummaryCard label={t(locale, "result.skipped")} tone="skip" value={report?.summary.skipped ?? 0} />
           <SummaryCard
-            label="Duration"
+            label={t(locale, "result.duration")}
             tone="duration"
             value={formatDuration(report?.durationMs)}
           />
         </section>
 
-        <section className="issues-block" aria-label="Top issues">
-          <h2>Top issues</h2>
+        <section className="issues-block" aria-label={t(locale, "issues.title")}>
+          <h2>{t(locale, "issues.title")}</h2>
           {report ? (
             topIssues.length > 0 ? (
               <ol>
@@ -247,31 +280,30 @@ export function App() {
                     key={result.id}
                     result={result}
                     selected={result.id === selectedResult?.id}
+                    locale={locale}
                     onSelect={() => setSelectedCheckId(result.id)}
                   />
                 ))}
               </ol>
             ) : (
-              <p className="positive-callout">No protocol issues found in this run.</p>
+              <p className="positive-callout">{t(locale, "issues.noneFoundInRun")}</p>
             )
           ) : (
-            <p className="empty-copy">
-              Run a check to see compatibility issues ranked by impact.
-            </p>
+            <p className="empty-copy">{t(locale, "issues.empty")}</p>
           )}
         </section>
 
         {report?.summary.ok ? (
           <div className="usable-callout">
             <span aria-hidden="true" className="ok-mark" />
-            <span>{getUsabilityText(report)}</span>
+            <span>{getUsabilityText(report, locale)}</span>
           </div>
         ) : null}
 
         <details className="advanced" open={Boolean(report)}>
           <summary>
-            <span>Show advanced details</span>
-            <small>Check IDs, durations, categories, details JSON, and raw report.</small>
+            <span>{t(locale, "advanced.show")}</span>
+            <small>{t(locale, "advanced.help")}</small>
           </summary>
 
           {report ? (
@@ -279,10 +311,10 @@ export function App() {
               <table>
                 <thead>
                   <tr>
-                    <th>Status</th>
-                    <th>Check</th>
-                    <th>Result</th>
-                    <th>Duration</th>
+                    <th>{t(locale, "advanced.status")}</th>
+                    <th>{t(locale, "advanced.check")}</th>
+                    <th>{t(locale, "advanced.result")}</th>
+                    <th>{t(locale, "result.duration")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -293,7 +325,7 @@ export function App() {
                       onClick={() => setSelectedCheckId(result.id)}
                     >
                       <td>
-                        <StatusLabel status={result.status} />
+                        <StatusLabel status={result.status} locale={locale} />
                       </td>
                       <td>
                         <code>{result.id}</code>
@@ -307,26 +339,28 @@ export function App() {
 
               <aside className="details-inspector">
                 <div className="inspector-header">
-                  <h3>Selected check</h3>
-                  {selectedResult ? <StatusLabel status={selectedResult.status} /> : null}
+                  <h3>{t(locale, "advanced.selectedCheck")}</h3>
+                  {selectedResult ? (
+                    <StatusLabel status={selectedResult.status} locale={locale} />
+                  ) : null}
                 </div>
                 {selectedResult ? (
-                  <CheckDetails result={selectedResult} />
+                  <CheckDetails result={selectedResult} locale={locale} />
                 ) : (
-                  <p className="empty-copy">Select a check to inspect details.</p>
+                  <p className="empty-copy">{t(locale, "advanced.selectCheck")}</p>
                 )}
                 <div className="inspector-actions">
                   <button disabled={!report} onClick={handleCopyJson} type="button">
-                    Copy JSON
+                    {t(locale, "actions.copyJson")}
                   </button>
                   <button disabled={!selectedResult} onClick={handleCopyDetails} type="button">
-                    Copy details
+                    {t(locale, "actions.copyDetails")}
                   </button>
                 </div>
               </aside>
             </div>
           ) : (
-            <p className="empty-copy">Advanced details will appear after a run.</p>
+            <p className="empty-copy">{t(locale, "advanced.empty")}</p>
           )}
         </details>
       </section>
@@ -336,19 +370,21 @@ export function App() {
 
 function StatusBanner({
   attention,
+  locale,
   message,
   report,
   runState,
 }: {
   attention: AttentionLevel;
+  locale: DesktopLocale;
   message: string | null;
   report: WireCheckReport | null;
   runState: RunState;
 }) {
-  const copy = getBannerCopy(attention, report, message, runState);
+  const copy = getBannerCopy(attention, report, message, runState, locale);
 
   return (
-    <section className={`status-banner ${attention}`} aria-label="Run status">
+    <section className={`status-banner ${attention}`} aria-label={t(locale, "advanced.status")}>
       <span aria-hidden="true" className="banner-icon">
         {attention === "failed" ? "x" : attention === "ok" ? "" : "!"}
       </span>
@@ -381,10 +417,12 @@ function SummaryCard({
 }
 
 function IssueRow({
+  locale,
   onSelect,
   result,
   selected,
 }: {
+  locale: DesktopLocale;
   onSelect: () => void;
   result: CheckResult;
   selected: boolean;
@@ -397,49 +435,61 @@ function IssueRow({
           <strong>{result.title}</strong>
           <em>{result.message}</em>
         </span>
-        <StatusTag status={result.status} />
+        <StatusTag status={result.status} locale={locale} />
         <span aria-hidden="true" className="chevron" />
       </button>
     </li>
   );
 }
 
-function StatusTag({ status }: { status: CheckResult["status"] }) {
-  const label = status === "warn" ? "Warning" : status;
+function StatusTag({
+  locale,
+  status,
+}: {
+  locale: DesktopLocale;
+  status: CheckResult["status"];
+}) {
+  const label = status === "warn" ? t(locale, "status.warning") : statusLabel(status, locale);
   return <span className={`status-tag ${status}`}>{label}</span>;
 }
 
-function StatusLabel({ status }: { status: CheckResult["status"] }) {
+function StatusLabel({
+  locale,
+  status,
+}: {
+  locale: DesktopLocale;
+  status: CheckResult["status"];
+}) {
   return (
     <span className={`status-label ${status}`}>
       <span aria-hidden="true" />
-      {statusLabel(status)}
+      {statusLabel(status, locale)}
     </span>
   );
 }
 
-function CheckDetails({ result }: { result: CheckResult }) {
+function CheckDetails({ locale, result }: { locale: DesktopLocale; result: CheckResult }) {
   return (
     <div className="detail-body">
       <dl>
         <div>
-          <dt>Title</dt>
+          <dt>{t(locale, "advanced.titleField")}</dt>
           <dd>{result.title}</dd>
         </div>
         <div>
-          <dt>Severity</dt>
+          <dt>{t(locale, "advanced.severity")}</dt>
           <dd>{result.severity}</dd>
         </div>
         <div>
-          <dt>Category</dt>
+          <dt>{t(locale, "advanced.category")}</dt>
           <dd>{result.category}</dd>
         </div>
         <div>
-          <dt>Duration</dt>
+          <dt>{t(locale, "result.duration")}</dt>
           <dd>{result.durationMs}ms</dd>
         </div>
         <div className="wide">
-          <dt>Message</dt>
+          <dt>{t(locale, "advanced.message")}</dt>
           <dd>{result.message}</dd>
         </div>
       </dl>
@@ -465,39 +515,35 @@ function getBannerCopy(
   report: WireCheckReport | null,
   message: string | null,
   runState: RunState,
+  locale: DesktopLocale,
 ): { title: string; body: string } {
   if (runState === "running") {
     return {
-      title: "Running checks",
-      body: "AI Ping is checking the selected endpoint protocol behavior.",
+      title: t(locale, "status.running"),
+      body: t(locale, "result.runningBody"),
     };
   }
   if (attention === "failed") {
     return {
-      title: "Needs attention",
-      body:
-        message ??
-        "One or more required checks failed. Review the top issues before using this endpoint.",
+      title: t(locale, "status.needsAttention"),
+      body: message ?? t(locale, "result.requiredFailedReview"),
     };
   }
   if (attention === "attention") {
     return {
-      title: "Needs attention",
-      body:
-        "Required checks passed, but some recommended compatibility checks need attention.",
+      title: t(locale, "status.needsAttention"),
+      body: t(locale, "result.recommendedNeedAttention"),
     };
   }
   if (attention === "ok") {
     return {
-      title: "Endpoint looks usable",
-      body: "Required and recommended checks passed for this profile.",
+      title: t(locale, "status.ok"),
+      body: t(locale, "result.allChecksPassed"),
     };
   }
   return {
-    title: "Ready to check",
-    body: report
-      ? "Review the latest run below."
-      : "Choose a profile, enter endpoint details, and run protocol checks.",
+    title: t(locale, "status.ready"),
+    body: report ? t(locale, "result.reviewLatestRun") : t(locale, "result.readyBody"),
   };
 }
 
@@ -515,11 +561,11 @@ function issueWeight(result: CheckResult): number {
   return statusWeight + severityWeight;
 }
 
-function getUsabilityText(report: WireCheckReport): string {
+function getUsabilityText(report: WireCheckReport, locale: DesktopLocale): string {
   if (report.summary.warned > 0) {
-    return "Basic required checks are usable. Review recommended compatibility warnings before shipping.";
+    return t(locale, "result.usableWithWarnings");
   }
-  return "Basic and recommended compatibility checks are usable.";
+  return t(locale, "result.usable");
 }
 
 function formatDuration(durationMs: number | undefined): string {
@@ -528,16 +574,16 @@ function formatDuration(durationMs: number | undefined): string {
   return `${(durationMs / 1000).toFixed(1)}s`;
 }
 
-function statusLabel(status: CheckResult["status"]): string {
-  if (status === "pass") return "Passed";
-  if (status === "warn") return "Warned";
-  if (status === "fail") return "Failed";
-  return "Skipped";
+function statusLabel(status: CheckResult["status"], locale: DesktopLocale): string {
+  if (status === "pass") return t(locale, "result.passed");
+  if (status === "warn") return t(locale, "result.warned");
+  if (status === "fail") return t(locale, "result.failed");
+  return t(locale, "result.skipped");
 }
 
-function apiKeyPlaceholder(profile?: ProtocolProfile): string {
-  if (!profile) return "Optional";
+function apiKeyPlaceholder(profile: ProtocolProfile | undefined, locale: DesktopLocale): string {
+  if (!profile) return t(locale, "profile.apiKeyPlaceholder.optional");
   return getProfileDefaults(profile.id).requiresApiKey
-    ? "Required by most hosted APIs"
-    : "Optional";
+    ? t(locale, "profile.apiKeyPlaceholder.required")
+    : t(locale, "profile.apiKeyPlaceholder.optional");
 }
