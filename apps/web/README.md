@@ -4,6 +4,12 @@ AI Ping Web Playground is a Vite + React static app for running AI Ping checks
 directly in the browser. It is a preview entry point for quick OpenAI-compatible
 endpoint checks without installing the CLI or Desktop app.
 
+Production demo:
+
+```text
+https://demo.aiping.dev
+```
+
 ## Privacy Boundary
 
 - Requests go directly from the browser to the endpoint entered by the user.

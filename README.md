@@ -9,6 +9,8 @@ compatibility.
 
 > Ping AI APIs before your clients do.
 
+Try the Web Playground: [demo.aiping.dev](https://demo.aiping.dev)
+
 Read this in other languages:
 
 - [简体中文](docs/readme/README.zh-Hans.md)
@@ -58,6 +60,8 @@ AI Ping v1.3 adds a Web Playground Preview for quick browser-based checks of
 `openai-chat` and `openai-responses` endpoints. It runs as a static Vite app:
 the browser sends requests directly to the endpoint you enter, and AI Ping does
 not provide a Worker or server proxy.
+
+Open it at [demo.aiping.dev](https://demo.aiping.dev).
 
 ```bash
 pnpm install
