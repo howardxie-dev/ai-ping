@@ -23,6 +23,12 @@ Use this checklist for AI Ping v1.0 and later 1.x releases.
 - [ ] For v1.2 Desktop Preview: `pnpm --filter @starroy/ai-ping-desktop build`
 - [ ] For v1.2 Desktop Preview: `pnpm desktop:build:app`
 - [ ] For v1.2 Desktop Preview: `pnpm desktop:build:dmg`
+- [ ] For v1.3 Web Playground: `pnpm --filter @starroy/ai-ping-web test`
+- [ ] For v1.3 Web Playground: `pnpm --filter @starroy/ai-ping-web typecheck`
+- [ ] For v1.3 Web Playground: `pnpm --filter @starroy/ai-ping-web build`
+- [ ] Confirm Cloudflare Pages build command is
+      `pnpm --filter @starroy/ai-ping-web build`
+- [ ] Confirm Cloudflare Pages output directory is `apps/web/dist`
 
 ## Desktop Preview Smoke
 
@@ -45,6 +51,23 @@ Use this checklist for AI Ping v1.0 and later 1.x releases.
 - [ ] Confirm API keys are kept in memory only and are not persisted
 - [ ] Confirm the build is unsigned / ad-hoc unless Developer ID signing and
       notarization are explicitly enabled for the release
+
+## Web Playground Smoke
+
+- [ ] Open the Web Playground preview
+- [ ] Confirm the page supports English, Simplified Chinese, and Traditional
+      Chinese without saving language preference
+- [ ] Confirm the privacy notice is visible near the configuration form
+- [ ] Confirm the CORS limitation notice is visible near the privacy notice
+- [ ] Confirm only `openai-chat` and `openai-responses` are exposed by default
+- [ ] Run one `openai-chat` check against a disposable endpoint
+- [ ] Run one `openai-responses` check against a disposable endpoint
+- [ ] Trigger a likely CORS / fetch failure and confirm friendly copy is shown
+- [ ] Export one JSON report
+- [ ] Export one HTML report
+- [ ] Refresh the page and confirm the API key field is cleared
+- [ ] Confirm there is no Worker, `/api/check`, `/api/proxy`, request proxy,
+      hosted report storage, history, login, or share-link flow
 
 ## CLI Smoke
 

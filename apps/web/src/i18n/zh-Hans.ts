@@ -1,0 +1,93 @@
+import type { Messages } from "./types";
+
+export const messages = {
+  app: {
+    title: "AI Ping Web Playground 预览版",
+    eyebrow: "无需安装。在浏览器中运行。API Key 不经过 AI Ping 服务器。",
+  },
+  nav: {
+    github: "GitHub",
+    npm: "npm",
+    desktop: "Desktop",
+    language: "语言",
+  },
+  notice: {
+    privacyTitle: "隐私说明",
+    privacyItems: [
+      "请求会从你的浏览器直接发送到你填写的 endpoint。",
+      "API Key 仅保存在当前浏览器标签页内。",
+      "AI Ping 不代理、不保存、不记录你的请求。",
+      "请只为你信任的 endpoint 填写 API Key。",
+    ],
+    corsTitle: "浏览器限制",
+    corsBody:
+      "浏览器测试受 CORS 限制。如果 endpoint 阻止浏览器请求，请使用 CLI 或 Desktop 版本。",
+  },
+  config: {
+    title: "配置",
+    profile: "协议类型",
+    baseUrl: "Base URL",
+    model: "模型",
+    apiKey: "API Key",
+    timeout: "超时时间",
+    seconds: "秒",
+    run: "运行检查",
+    running: "正在运行...",
+    clear: "清空",
+    keyNote: "API Key 只保存在内存中，刷新页面后会清空。",
+  },
+  profile: {
+    "openai-chat": "OpenAI Chat",
+    "openai-responses": "OpenAI Responses",
+    chatDescription: "用于 OpenAI-compatible /chat/completions endpoint。",
+    responsesDescription: "用于 OpenAI-compatible /responses endpoint。",
+  },
+  result: {
+    title: "结果",
+    readyTitle: "准备检查",
+    readyBody: "输入 endpoint 信息，然后运行浏览器协议检查。",
+    runningTitle: "正在运行检查",
+    runningBody: "AI Ping 正在从当前浏览器标签页直接检查 endpoint。",
+    okTitle: "Endpoint 可用",
+    attentionTitle: "需要注意",
+    failedTitle: "失败",
+    okBody: "此协议类型的必需和推荐检查均已通过。",
+    attentionBody: "必需检查已通过，但推荐兼容性检查需要注意。",
+    failedBody: "一个或多个必需检查失败。",
+    corsBody:
+      "浏览器无法访问该 endpoint。这可能是 CORS 导致的。请尝试使用 CLI 或 Desktop 版本进行本地检查。",
+    passed: "已通过",
+    warned: "警告",
+    failed: "失败",
+    skipped: "已跳过",
+    duration: "耗时",
+    topIssues: "主要问题",
+    noIssues: "本次运行未发现协议问题。",
+    emptyIssues: "运行检查后查看按影响排序的兼容性问题。",
+    usable: "基础检查可用。",
+    usableWithWarnings: "基础检查可用。发布前请查看警告。",
+  },
+  advanced: {
+    title: "高级详情",
+    help: "包含 Check ID、耗时、分类、details JSON 和原始报告。",
+    status: "状态",
+    check: "检查",
+    severity: "严重性",
+    category: "分类",
+    message: "消息",
+    details: "详情",
+  },
+  export: {
+    json: "导出 JSON",
+    html: "导出 HTML",
+    disabled: "请先运行检查再导出报告。",
+  },
+  validation: {
+    baseUrl: "请输入有效的绝对 URL。",
+    model: "请输入模型。",
+    timeout: "请至少使用 1 秒。",
+  },
+  footer: {
+    noProxy: "没有 Worker 代理，没有服务端 API Key，没有保存报告。",
+  },
+} satisfies Messages;

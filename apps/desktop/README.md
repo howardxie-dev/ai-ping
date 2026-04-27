@@ -4,7 +4,7 @@
 
 ## Status
 
-- Preview quality for v1.2.
+- Preview quality for v1.3.
 - macOS is the primary target.
 - The UI supports English, Simplified Chinese, and Traditional Chinese. The
   initial language follows the system locale when supported, and the in-app
@@ -44,7 +44,7 @@ pnpm desktop:build:dmg
 desktop:build:dmg` builds a drag-to-Applications DMG with the project icon and
 DMG background configured in `src-tauri/tauri.conf.json`.
 
-The v1.2 Desktop Preview package is unsigned / ad-hoc by default. It is suitable
+The v1.3 Desktop Preview package is unsigned / ad-hoc by default. It is suitable
 for local installation checks, but it is not yet notarized for public macOS
 distribution. Developer ID signing and Apple notarization are intentionally kept
 out of the default build path.
@@ -53,7 +53,7 @@ Expected local artifacts:
 
 ```text
 apps/desktop/src-tauri/target/release/bundle/macos/AI Ping Desktop Preview.app
-apps/desktop/src-tauri/target/release/bundle/dmg/AI Ping Desktop Preview_1.2.0_aarch64.dmg
+apps/desktop/src-tauri/target/release/bundle/dmg/AI Ping Desktop Preview_1.3.0_aarch64.dmg
 ```
 
 ## Smoke Checklist

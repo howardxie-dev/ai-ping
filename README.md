@@ -52,6 +52,31 @@ The local DMG build is unsigned / ad-hoc and is intended for local preview
 validation. See [apps/desktop/README.md](apps/desktop/README.md) for packaging
 commands, smoke checks, and preview limitations.
 
+## Web Playground Preview
+
+AI Ping v1.3 adds a Web Playground Preview for quick browser-based checks of
+`openai-chat` and `openai-responses` endpoints. It runs as a static Vite app:
+the browser sends requests directly to the endpoint you enter, and AI Ping does
+not provide a Worker or server proxy.
+
+```bash
+pnpm install
+pnpm web:dev
+pnpm web:build
+```
+
+For Cloudflare Pages, use `pnpm --filter @starroy/ai-ping-web build` as the
+build command and `apps/web/dist` as the output directory. No API environment
+variables are required or expected.
+
+API keys are kept in the current browser tab memory only and clear when the page
+reloads. AI Ping does not proxy, store, or log browser requests or reports.
+Because checks run in the browser, endpoint CORS policy applies; if a request is
+blocked by CORS or local-network browser rules, use the CLI or Desktop version.
+
+See [apps/web/README.md](apps/web/README.md) for deployment notes and the
+no-proxy privacy boundary.
+
 ## Quick Start
 
 ```bash

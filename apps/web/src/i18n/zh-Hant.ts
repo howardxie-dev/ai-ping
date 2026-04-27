@@ -1,0 +1,93 @@
+import type { Messages } from "./types";
+
+export const messages = {
+  app: {
+    title: "AI Ping Web Playground 預覽版",
+    eyebrow: "無需安裝。在瀏覽器中執行。API Key 不經過 AI Ping 伺服器。",
+  },
+  nav: {
+    github: "GitHub",
+    npm: "npm",
+    desktop: "Desktop",
+    language: "語言",
+  },
+  notice: {
+    privacyTitle: "隱私說明",
+    privacyItems: [
+      "請求會從你的瀏覽器直接傳送到你填寫的 endpoint。",
+      "API Key 僅保存在目前瀏覽器分頁內。",
+      "AI Ping 不代理、不儲存、不記錄你的請求。",
+      "請只為你信任的 endpoint 填寫 API Key。",
+    ],
+    corsTitle: "瀏覽器限制",
+    corsBody:
+      "瀏覽器測試受 CORS 限制。如果 endpoint 阻止瀏覽器請求，請使用 CLI 或 Desktop 版本。",
+  },
+  config: {
+    title: "設定",
+    profile: "協議類型",
+    baseUrl: "Base URL",
+    model: "模型",
+    apiKey: "API Key",
+    timeout: "逾時時間",
+    seconds: "秒",
+    run: "執行檢查",
+    running: "正在執行...",
+    clear: "清除",
+    keyNote: "API Key 只保存在記憶體中，重新整理頁面後會清空。",
+  },
+  profile: {
+    "openai-chat": "OpenAI Chat",
+    "openai-responses": "OpenAI Responses",
+    chatDescription: "用於 OpenAI-compatible /chat/completions endpoint。",
+    responsesDescription: "用於 OpenAI-compatible /responses endpoint。",
+  },
+  result: {
+    title: "結果",
+    readyTitle: "準備檢查",
+    readyBody: "輸入 endpoint 資訊，然後執行瀏覽器協議檢查。",
+    runningTitle: "正在執行檢查",
+    runningBody: "AI Ping 正在從目前瀏覽器分頁直接檢查 endpoint。",
+    okTitle: "Endpoint 可用",
+    attentionTitle: "需要注意",
+    failedTitle: "失敗",
+    okBody: "此協議類型的必需和建議檢查皆已通過。",
+    attentionBody: "必需檢查已通過，但建議相容性檢查需要注意。",
+    failedBody: "一個或多個必需檢查失敗。",
+    corsBody:
+      "瀏覽器無法存取該 endpoint。這可能是 CORS 導致的。請嘗試使用 CLI 或 Desktop 版本進行本機檢查。",
+    passed: "已通過",
+    warned: "警告",
+    failed: "失敗",
+    skipped: "已略過",
+    duration: "耗時",
+    topIssues: "主要問題",
+    noIssues: "本次執行未發現協議問題。",
+    emptyIssues: "執行檢查後查看按影響排序的相容性問題。",
+    usable: "基礎檢查可用。",
+    usableWithWarnings: "基礎檢查可用。發布前請查看警告。",
+  },
+  advanced: {
+    title: "進階詳情",
+    help: "包含 Check ID、耗時、分類、details JSON 和原始報告。",
+    status: "狀態",
+    check: "檢查",
+    severity: "嚴重性",
+    category: "分類",
+    message: "訊息",
+    details: "詳情",
+  },
+  export: {
+    json: "匯出 JSON",
+    html: "匯出 HTML",
+    disabled: "請先執行檢查再匯出報告。",
+  },
+  validation: {
+    baseUrl: "請輸入有效的絕對 URL。",
+    model: "請輸入模型。",
+    timeout: "請至少使用 1 秒。",
+  },
+  footer: {
+    noProxy: "沒有 Worker 代理，沒有伺服端 API Key，沒有儲存報告。",
+  },
+} satisfies Messages;

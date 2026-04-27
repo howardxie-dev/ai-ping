@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.3.0
+
+### Added
+
+- Added `@starroy/ai-ping-web`, a Vite + React Web Playground Preview for
+  browser-based `openai-chat` and `openai-responses` checks.
+- Added browser runner support that reuses `@starroy/ai-ping-core` `runChecks`
+  and sends requests directly from the browser to the user-entered endpoint.
+- Added browser JSON and HTML report exports using Blob downloads and the shared
+  `@starroy/ai-ping-report` HTML renderer.
+- Added Web i18n for English, Simplified Chinese, and Traditional Chinese.
+- Added Web result helpers for summary state, top issues, and usability copy.
+- Added friendly detection for likely browser CORS / fetch failures.
+
+### Notes
+
+- The Web Playground does not implement a Worker or proxy. API keys remain in
+  the current browser tab memory and are not sent to AI Ping servers.
+- Browser checks are limited by endpoint CORS policy; use CLI or Desktop when an
+  endpoint blocks browser requests.
+
 ## 1.2.0
 
 ### Added
