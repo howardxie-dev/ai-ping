@@ -22,7 +22,7 @@ describe("web report export", () => {
 
 const report: WireCheckReport = {
   tool: "ai-ping",
-  version: "1.3.0",
+  version: "1.4.0",
   profile: "openai-chat",
   endpoint: "https://example.test/v1",
   model: "test-model",

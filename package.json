@@ -1,6 +1,6 @@
 {
   "name": "ai-ping-workspace",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "description": "Quick protocol checks for AI and LLM API endpoints.",
   "license": "MIT",
@@ -18,6 +18,9 @@
     "build": "pnpm -r build",
     "desktop:build:app": "pnpm --filter @starroy/ai-ping-desktop build:app",
     "desktop:build:dmg": "pnpm --filter @starroy/ai-ping-desktop build:dmg",
+    "desktop:build:macos": "pnpm --filter @starroy/ai-ping-desktop build:macos",
+    "desktop:build:windows": "pnpm --filter @starroy/ai-ping-desktop build:windows",
+    "desktop:build:linux": "pnpm --filter @starroy/ai-ping-desktop build:linux",
     "desktop:dev": "pnpm --filter @starroy/ai-ping-desktop tauri:dev",
     "desktop:preview": "pnpm --filter @starroy/ai-ping-desktop dev",
     "web:build": "pnpm --filter @starroy/ai-ping-web build",

@@ -32,12 +32,13 @@ core library is `@starroy/ai-ping-core`.
 
 ## Desktop Preview
 
-AI Ping v1.2 includes a macOS-first Desktop Preview built with Tauri. It provides a
-local UI for choosing a profile, entering a base URL, model, API key, and
-timeout, running checks, inspecting results, and exporting JSON or HTML reports.
-The Desktop UI supports English, Simplified Chinese, and Traditional Chinese,
-detects the initial language from the system locale, and can be switched
-instantly from the app without saving a language preference.
+AI Ping v1.4 provides unsigned Tauri Desktop Preview artifacts for macOS,
+Windows, and Linux through GitHub Releases. The app provides a local UI for
+choosing a profile, entering a base URL, model, API key, and timeout, running
+checks, inspecting results, and exporting JSON or HTML reports. The Desktop UI
+supports English, Simplified Chinese, and Traditional Chinese, detects the
+initial language from the system locale, and can be switched instantly from the
+app without saving a language preference.
 
 ```bash
 pnpm install
@@ -47,12 +48,15 @@ pnpm desktop:build:dmg
 
 The Desktop Preview does not replace or translate CLI output, JSON reports, or
 HTML reports. It does not save API keys or language preferences, and does not
-add new checks or profiles. Windows and Linux packaging, notarization,
-automatic updates, saved settings, and history are planned for later releases.
+add new checks or profiles. Desktop Preview artifacts are attached to GitHub
+Releases only and are not published to npm.
 
-The local DMG build is unsigned / ad-hoc and is intended for local preview
-validation. See [apps/desktop/README.md](apps/desktop/README.md) for packaging
-commands, smoke checks, and preview limitations.
+The preview builds are unsigned / ad-hoc. Windows may show Microsoft
+SmartScreen warnings, and Linux behavior depends on the distribution,
+desktop environment, package format, and WebKitGTK availability. Automatic
+updates, saved settings, and history are not included. See
+[apps/desktop/README.md](apps/desktop/README.md) for packaging commands, smoke
+checks, and preview limitations.
 
 ## Web Playground Preview
 

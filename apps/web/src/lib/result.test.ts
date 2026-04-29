@@ -55,7 +55,7 @@ describe("result helpers", () => {
 function makeReport(overrides: Partial<WireCheckReport> = {}): WireCheckReport {
   return {
     tool: "ai-ping",
-    version: "1.3.0",
+    version: "1.4.0",
     profile: "openai-chat",
     endpoint: "https://example.test/v1",
     model: "test-model",

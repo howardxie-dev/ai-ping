@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.4.0
+
+### Added
+
+- Added a GitHub Actions release workflow that builds Tauri Desktop Preview
+  artifacts for macOS universal, Windows x64 / arm64, and Linux x64 / arm64
+  when a version tag is pushed, a GitHub Release is published, or the workflow
+  is run manually.
+- Added release artifact upload for unsigned macOS DMG / zipped app, Windows
+  NSIS setup `.exe` / MSI, and Linux DEB / AppImage preview packages.
+- Added Ubuntu runner setup for Tauri WebKitGTK, GTK, AppIndicator, SVG, and
+  patchelf packaging dependencies.
+
+### Documentation
+
+- Documented that Desktop Preview artifacts are unsigned, attached to GitHub
+  Releases only, and are not published to npm.
+- Documented Windows SmartScreen warnings, Linux distribution and desktop
+  environment caveats, and the absence of automatic updates for preview builds.
+
 ## 1.3.0
 
 ### Added

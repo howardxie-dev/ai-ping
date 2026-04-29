@@ -30,10 +30,11 @@ CLI 包名是 `@starroy/ai-ping`，命令名是 `aiping`。可复用 Core 库包
 
 ## Desktop Preview
 
-AI Ping v1.2 包含 macOS-first 的 Tauri Desktop Preview。它提供本地 UI，用于选择
-profile、填写 base URL、model、API key 和 timeout，运行 checks，查看结果，并导出
-JSON 或 HTML report。Desktop UI 支持 English、简体中文和繁體中文，会根据系统语言
-选择初始语言，也可以在应用内即时切换；语言偏好不会被保存。
+AI Ping v1.4 通过 GitHub Releases 提供 unsigned 的 macOS、Windows 和 Linux
+Tauri Desktop Preview artifacts。它提供本地 UI，用于选择 profile、填写 base URL、
+model、API key 和 timeout，运行 checks，查看结果，并导出 JSON 或 HTML report。
+Desktop UI 支持 English、简体中文和繁體中文，会根据系统语言选择初始语言，也可以在
+应用内即时切换；语言偏好不会被保存。
 
 ```bash
 pnpm install
@@ -42,11 +43,13 @@ pnpm desktop:build:dmg
 ```
 
 Desktop Preview 不替代 CLI，不翻译 CLI 输出、JSON report 或 HTML report，不保存
-API key 或语言偏好，也不新增 checks 或 profiles。Windows / Linux 打包、
-notarization、自动更新、保存设置和历史记录会放到后续版本。
+API key 或语言偏好，也不新增 checks 或 profiles。Desktop Preview artifacts 只会附加到
+GitHub Releases，不会发布到 npm。
 
-本地 DMG 构建是 unsigned / ad-hoc，仅用于本地预览验证。打包命令、smoke checks
-和预览限制详见 [apps/desktop/README.md](../../apps/desktop/README.md)。
+这些 preview 构建是 unsigned / ad-hoc。Windows 可能显示 Microsoft SmartScreen
+提醒；Linux 行为取决于发行版、桌面环境、包格式和 WebKitGTK 可用性。自动更新、
+保存设置和历史记录暂不包含。打包命令、smoke checks 和预览限制详见
+[apps/desktop/README.md](../../apps/desktop/README.md)。
 
 ## Web Playground Preview
 
